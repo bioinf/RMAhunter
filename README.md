@@ -27,9 +27,9 @@ Systematic correction of reference minor alleles in clinical variant calling.
 ### How to install & run local version
 
 ~~~
-git clone https://github.com/bioinf/RMAhunter.git ./
+git clone https://github.com/bioinf/RMAhunter.git && cd RMAhunter
 gzip -d build/data/sdf_plus.csv.gz build/data/sdf.csv.gz
-chmod +x build/exec/*, build/hunter.py
+chmod +x build/exec/* build/hunter.py
 ~~~
 
 ~~~
