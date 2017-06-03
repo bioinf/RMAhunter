@@ -3,7 +3,7 @@ label { user-select: none; }
 
 body {
     font: 14px 'Segoe UI','DejaVu Sans',Helvetica,'Trebuchet MS',Arial,sans-serif;
-    font-weight: 100;
+    font-weight: 400;
     color: #222;
     overflow-x: hidden;
     background: #f9f7ff;
@@ -433,6 +433,9 @@ table tr:hover .pr-score {
 	width: 280px;
     line-height: 25px;
     text-align: center;
+}
+.local .nav {
+    display: none;
 }
 .abox.l {
 	float: left

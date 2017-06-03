@@ -1,11 +1,11 @@
-
 <!DOCTYPE html>
-<html lang="en" ng-app="flat.auth">
+<html lang="en">
 <head>
-    <title>RMA Hunter</title>
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
+    <title>RMA Hunter</title>
     <link rel="stylesheet" href="client/style.css">
     <link rel="shortcut icon" href="client/favicon.ico" type="image/x-icon" >
 </head>
@@ -222,6 +222,7 @@
         </tbody>
         </table>
     </div>
+    
     <div class="genes-set" id="gset">
         <div class="header" id="header-gset">Analyze specific gene set</div>
         <a class="close" id="gset-close">
@@ -235,8 +236,9 @@
             <button id="gset-save" class="shadow btn">Apply</button>
         </div>
     </div>
+
     <div class="tables" id="result">
-        <p class="spec-set">
+        <p class="spec-set" id="top-pane">
             <a id="gset-open" href="#">Analyze specific gene set<span id="gset-count"></span></a>
             <a id="go-back" href="/">&larr; return back (reset all)</a>
         </p>
@@ -296,6 +298,7 @@
         <div class="log" id="log"></div>
     </div>
 </div>
+<script>/* data-local */</script>
 <script src="client/app.js"></script>
 </body>
 </html>

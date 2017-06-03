@@ -18,8 +18,7 @@ app.use(parser.urlencoded({extended : true, limit: '500mb'}));
 /* -------------------------------------------------------------------------- */
 app.post('/upload', (req, res) => {
     // Демонстрашка
-    if (req.body.coding == 'demo')
-    {
+    if (req.body.coding == 'demo'){
         setTimeout(function(){
             res.send(JSON.stringify(['demo', [208,2378,7,9]]));
         }, 2 * 1000);
@@ -42,10 +41,11 @@ app.post('/upload', (req, res) => {
 		if (chr == 0 || isNaN(chr)) return false;
 		vcf[chr] = {};
 		blocks.splice(1).map(function(block){
-			var tmp = block.split('@');
+			var tmp = block.split('@'); // offet @ zyg @ ref @ alt,alt,alt,alt
 			var d3  = tmp[3].split(',');
 			last += parseInt(tmp[0], 32);
-			for (var d in d3){
+			for (var d in d3) {
+    			// chr (num), pos, ref, alt, zyg (num)
     			vcf += [chr, last, tmp[2], d3[d], parseInt(tmp[1])].join('\t');
     			vcf += '\n';
 			}

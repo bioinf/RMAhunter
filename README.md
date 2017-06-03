@@ -29,12 +29,26 @@ Systematic correction of reference minor alleles in clinical variant calling.
 ~~~
 git clone https://github.com/latur/RMA-Hunter.git ./
 gzip -d build/data/sdf_plus.csv.gz build/data/sdf.csv.gz
-chmod +x build/exec/*
-# ...
+chmod +x build/exec/*, build/hunter.py
+~~~
+
+~~~
+Usage:
+  ./build/hunter.py [input vcf-file] [Optional arguments]
+
+Optional arguments:
+  -f  Path to `input.vcf` file
+  -c  Report coding only [0 or 1]. Default: 1
+  -m  Allelic frequency cutoff. Default: 0.01
+  -o  Output dir name
+
+Examples:
+  ./build/hunter.py input.vcf
+  ./build/hunter.py -f input.vcf -c 0 -m 0.05 -o results
 ~~~
 
 
-## How to run web-based version
+## How to start a server with a web-version
 
 Install Node.JS, npm, forever. Example (ubuntu):
 
@@ -49,7 +63,8 @@ npm install
 Starting web-server on port `8915`
 
 ~~~
-forever start ./build/web/hunter.js 8915
+nodejs ./build/web/hunter.js 8915 # for debug
+forever start ./build/web/hunter.js 8915 # for production
 ~~~
 
 If file `build/data/sdf.csv` has been updated, you need to create a file with a list of genes for the web version:
@@ -67,8 +82,8 @@ echo "exports.e = {" $(
 ### How to build from sources
 
 ~~~
-g++ -Werror -Wall -std=c++11 src/hunter.cpp -o build/exec/hunter # debug
-g++ -g -std=c++11 src/hunter.cpp -o build/exec/hunter # production
+g++ -Werror -Wall -std=c++11 src/hunter.cpp -o build/exec/hunter # for debug
+g++ -g -std=c++11 src/hunter.cpp -o build/exec/hunter # for production
 
 # Delete temporary files
 rm -f build/web/results/*
