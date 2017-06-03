@@ -1,0 +1,474 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+label { user-select: none; }
+
+body {
+    font: 14px 'Segoe UI','DejaVu Sans',Helvetica,'Trebuchet MS',Arial,sans-serif;
+    font-weight: 100;
+    color: #222;
+    overflow-x: hidden;
+    background: #f9f7ff;
+}
+
+h1 {
+	text-align: center;
+	font-weight: 100;
+	padding: 10px 0 20px 0;
+}
+.logo {
+	width: 110px;
+    display: block;
+    margin: 20px auto 0 auto;
+}
+.animate {
+	-moz-transition: all 0.3s ease;
+	-webkit-transition: all 0.3s ease;
+	-o-transition: all 0.3s ease;
+	transition: all 0.3s ease;
+}
+.window {
+	position: relative;
+	z-index: 20
+}
+.template {
+	display: none;
+}
+.shadow {
+    box-shadow: 0 2px 8px 0 rgba(0,0,0,.15);
+}
+.input {
+	padding: 0 20px;
+	max-width: 840px;
+	margin: auto;
+}
+.hello {
+    margin: auto;
+    font-size: 15px;
+    line-height: 22px;
+}
+.cc {
+	margin: 20px 0 0 0;
+}
+.hello p {
+	margin-bottom: 10px;
+}
+.box {
+	margin-bottom: 10px;
+	float: left;
+}
+
+.main {
+    background: #FFF;
+    overflow: hidden;
+    margin: 0 -20px 10px -20px;
+    padding: 15px 19px 0 19px;
+    border: 1px dashed #eee;
+    box-sizing: border-box;
+    border-radius: 5px;
+}
+.main p {
+	text-align: center;
+	margin-bottom: 8px;
+}
+.upload {
+    margin: 0 -5px;
+	width: 380px;
+	float: left;
+}
+.upload .box {
+	width: 50%;
+	padding: 0 5px;
+	float: left;
+}
+.correct {
+    margin: 0 -5px;
+	float: right;
+	width: 380px;
+}
+.correct .box {
+	width: 33.333%;
+	padding: 0 5px;
+}
+
+svg.next {
+	margin: 30px auto 0 auto;
+	width: 60px;
+	display: block;
+	color: #F00;
+}
+.inf {
+	font-size: 12px;
+	padding: 7px 5px;
+	margin-right: -30px;
+}
+.log {
+	line-height: 20px;
+}
+
+.tables {
+	padding: 0 10px;
+	display: none;
+	max-width: 1400px;
+	margin: auto;
+    margin-bottom: 300px;
+}
+#t1, #t3 {
+    background: #ffb1b1;
+    border: 1px solid #ff8383;
+}
+#t2, #t4 {
+    background: rgba(44, 197, 0, 0.3);
+    border: 1px solid #31ce00;
+}
+    
+    
+table {
+    border-collapse: collapse;
+	text-align: left;
+	width: 100%;
+	table-layout: fixed;
+}
+table thead {
+	background: #fff9dd;
+}
+table th {
+    height: 22px;
+	vertical-align: bottom;
+	padding: 10px 8px;
+	font-weight: 100;
+	line-height: 0;
+	border-bottom: 1px solid #eaeaea;
+}
+table th:not(:last-child) {
+    border-right: 1px solid #eaeaea;
+}
+table .tr:hover {
+	background: #fff9dd;
+}
+table td {
+    line-height: 0;
+	position: relative;
+	height: 22px;
+    padding: 2px 7px;
+    border-right: 1px solid #eaeaea;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.table {
+	margin-bottom: 10px;
+	background: #f6f6f6;
+	background: #fff;
+	border-radius: 5px;
+	border: 1px solid #e6e6e6;
+}
+.table .head {
+	cursor: pointer;
+	position: relative;
+	padding: 8px 12px;
+}
+.table .head .title {
+    line-height: 20px;
+}
+.table .head .desc {
+    line-height: 18px;
+    color: #444;
+    font-size: 95%;
+}
+.table .body {
+	background: #fcfcfc;
+	border-radius:0 0 5px 5px;
+	height: 0;
+    overflow: hidden;
+}
+.table .pr {
+    display: block;
+    position: relative;
+    margin-right: 40px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    height: 18px;
+    line-height: 18px;
+}
+.table .pr-score {
+	opacity: 0.5;
+    position: absolute;
+    right: 5px;
+    line-height: 18px;
+    font-size: 11px;
+    top: 2px;
+}
+table tr:hover .pr-score {
+	opacity: 1;
+}
+.table .count {
+    float: right;
+    border-radius: 10px;
+    background: #ffe782;
+    padding: 0px 7px;
+    line-height: 18px;
+    font-size: 14px;
+    margin: 0px 22px 0px 0;
+    border: 1px solid #ffad44;
+}
+.table .open-pane {
+	right:7px;
+	top:6px;
+	position: absolute;
+}
+
+.table.opened .open-pane {
+	-moz-transform: rotate(180deg);
+	-webkit-transform: rotate(180deg);
+	-o-transform: rotate(180deg);
+	transform: rotate(180deg);
+}
+.table.opened .body {
+	height: 152px;
+}
+.emplty {
+	font-size: 50px;
+    color: #eee;
+    text-align: center;
+    line-height: 60px;
+    height: 65px;
+}
+
+.spec-set {
+	margin: 7px 0
+}
+.spec-set a {
+	cursor: pointer;
+    text-decoration: none;
+    border-bottom: 1px dashed;
+    margin: 0 12px;
+}
+#gset-open {
+    float: right;
+}
+#go-back {
+    
+}
+
+@media (max-width: 1420px) {
+	.tables {
+		padding: 0 10px;
+		width: 100%;
+	}
+}
+@media (max-width: 1100px) {
+	table td, table th {
+		padding: 2px 6px;
+		font-size: 90%;
+	}
+}
+@media (max-width: 980px) {
+	table td, table th {
+		padding: 2px 5px;
+		font-size: 80%;
+	}
+}
+
+.genes-set {
+	display: none;
+	z-index: 60;
+	position: absolute; 
+	left: 500px;
+	top: 200px;
+	width: 420px;
+	min-height: 120px;
+	background: #fff;
+	border-radius: 5px;
+	box-shadow: 0px 5px 45px rgba(0,0,0,0.2), 0px 0px 1px rgba(0,0,0,0.3);
+	padding: 55px 20px 20px 20px;
+}
+
+.genes-set .header {
+	cursor: move;
+	z-index: 0;
+	position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 44px;
+    background: rgba(90, 0, 255, 0.05);
+    border-radius: 5px 5px 0 0;
+	padding: 15px 20px;
+    font-size: 16px;
+}
+
+.genes-set p {
+	line-height: 20px;
+	margin-bottom: 10px;
+}
+.genes-set .close {
+	z-index: 5;
+	cursor: pointer;
+	position: absolute;
+	right: 10px;
+	top:10px;
+}
+
+.form-c {
+	margin-bottom: 8px;
+	width: 100%;
+	resize: vertical;
+    -webkit-appearance: none;
+    padding: 5px 8px;
+    font-size: 13px;
+    line-height: 1.4;
+    background-color: #fff;
+    border: 1px solid #d9d9d9;
+    border-top-color: silver;
+    border-radius: 1px;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    -webkit-transition: none;
+    -o-transition: none;
+    transition: none;
+}
+.form-c:active, .form-c:focus {
+	outline: 0;
+    border-color: #4d90fe;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,.3);
+}
+
+
+.inputfile {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+.inputfile + label, .btn {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+    display: inline-block;
+    overflow: hidden;
+    padding: 10px 0;
+    border: none;
+	font-size: 13px;
+    font-weight: 100;
+}
+
+.btn:active, 
+.btn:focus,
+.inputfile:active + label,
+.inputfile:focus + label,
+.inputfile.has-focus + label {
+    outline: 1px dotted #000 !important;
+    outline: none !important;
+}
+
+.input-btn + label, .btn {
+    color: #fff;
+    background-color: #6f5dff;
+	border-radius: 5px;
+	width: 100%;
+	margin: auto;
+	display: block;
+	text-align: center;
+}
+
+.input-btn:focus + label,
+.input-btn.has-focus + label,
+.input-btn + label:hover,
+.shadow.btn:hover {
+    background-color: #5845ff;
+	box-shadow: 0 1px 5px 0 rgba(0,0,0,.25);
+    cursor: pointer;
+}
+.input-btn:active + label, .btn:active {
+    background-color: #6250ff;
+	box-shadow: inset 0 2px 8px 0 rgba(0,0,0,0.3) !important;
+}
+
+.btn-box {
+	border-radius: 5px;
+	width: 100%;
+	margin: auto;
+	display: block;
+	padding: 10px 0;
+	background: #f7f7f7;
+    text-align: center;
+}
+
+.ref-afs {
+    margin-bottom: 0;
+    height: 36px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.disable .btn, 
+.disable .input-btn + label,
+.disable .btn:hover {
+	box-shadow: none;
+	background: #ababab;
+	color: #ddd;
+	cursor: default !important;
+}
+
+.example {
+    margin: 30px auto;
+    width: 190px;
+    background-color: #ff5d6c;
+}
+.example.btn:hover {
+    background-color: #ff2d41;
+}
+
+
+.nav-pane {
+    position: relative;
+	padding: 5px;
+    border-top: 1px dashed #eee;		
+}
+.nav {
+    margin: auto;
+	width: 280px;
+    line-height: 25px;
+    text-align: center;
+}
+.abox.l {
+	float: left
+}
+.abox.r {
+	float: right;
+}
+.abox a:hover {
+	background: #e0e0e0;
+}
+.abox a:active {
+	box-shadow: inset 0 1px 6px rgba(0,0,0,0.1);
+}
+.abox a:first-child {
+	border-radius: 5px 0 0 5px;
+}
+.abox a:last-child {
+	border-radius: 0 5px 5px 0;
+}
+.a-download {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    font-size: 12px;
+}
+.btn-nav {
+	width: 35px;
+	height: 25px;
+	background: #eee;
+	float: left;
+	text-align: center;
+	cursor: pointer;
+}
+.btn-nav svg {
+	height: 19px;
+    margin: 3px;
+    width: 19px;
+}
+

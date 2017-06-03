@@ -1,0 +1,5 @@
+_*
+index.php
+node_modules/*
+build/data/*.csv
+build/web/results/*
