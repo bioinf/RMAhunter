@@ -29,12 +29,12 @@ Systematic correction of reference minor alleles in clinical variant calling.
 ~~~
 git clone https://github.com/bioinf/RMAhunter.git && cd RMAhunter
 gzip -d build/data/sdf_plus.csv.gz build/data/sdf.csv.gz
-chmod +x build/exec/* build/hunter.py
+chmod +x build/exec/* build/*.py
 ~~~
 
 ~~~
 Usage:
-  ./build/hunter.py [input vcf-file] [Optional arguments]
+  ./build/hunter2.py [input vcf-file] [Optional arguments]
 
 Optional arguments:
   -f  Path to `input.vcf` file
