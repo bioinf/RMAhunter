@@ -1,4 +1,5 @@
 "use strict";
+var local_data = local_data || false;
 
 function Request(url, data, after, method){
     var method = method || 'POST';
