@@ -116,28 +116,10 @@ var init = function(e){
             $('dl' + i).style.display  = t.count > 0 ? 'block' : 'none';
             $('dl' + i).href = '/results/' + key + '.ts' + i;
 
-            if (local_data) {
-                t.classList.add('local')
-                var x = make_table_rows(local_data.table[i], i);
-                if (x.length != 0) {
-                    t.data.innerHTML = x.join('');
-                    t.content = x.length * 22 + 45 + 36 + 'px';
-                } else {
-                    t.data.innerHTML = Tpl('row-empty', {});
-                    t.content = 70 + 45 + 36 + 'px';
-                }
-                $('dl' + i).href = key + '.ts' + i;
-                return ;
-            }
-
             t.maxpages = Math.floor(t.count/onpage) + 1;
-
-            var p = (t.page - 1) + '';
-            if (p.length == 2) p = '0'  + p;
-            if (p.length == 1) p = '00' + p;
-
-            Request('/results/' + key + '.ts' + i + '.p' + p, '', function(e){
-                var x = make_table_rows(e, i);
+            
+            var load_part = function(table_part){
+                var x = make_table_rows(table_part, i);
                 if (x.length != 0) {
                     t.data.innerHTML = x.join('');
                     t.content = x.length * 22 + 45 + 36 + 'px';
@@ -148,7 +130,22 @@ var init = function(e){
                 $('pgI' + i).innerHTML = t.page;
                 $('pgC' + i).innerHTML = t.maxpages;
                 if (t.opened) t.tbody.style.height = t.content;
-            }, 'GET');
+            };
+
+            if (local_data) {
+                var cn = (t.page - 1) * onpage
+                var e = local_data.table[i].split('\n').slice(cn, cn + onpage).join('\n');
+                load_part(e, i);
+                $('dl' + i).href = key + '.t' + i;
+                return ;
+            } else {
+                var p = (t.page - 1) + '';
+                if (p.length == 2) p = '0'  + p;
+                if (p.length == 1) p = '00' + p;
+                Request('/results/' + key + '.ts' + i + '.p' + p, '', function(e){
+                    load_part(e, i)
+                }, 'GET');
+            }
         };
         
         t.load();
@@ -196,7 +193,7 @@ if (local_data) {
     }).join();
     $('top-pane').innerHTML = '<select id="sampleID">' + opt + '</select>';
     $('sampleID').onchange = function(){ location.href = this.value; }
-    init(JSON.stringify(['data/_e' + (local_data.samples.indexOf(local_data.current)), local_data.counts]));
+    init(JSON.stringify(['data/tbl.' + (local_data.samples.indexOf(local_data.current)), local_data.counts]));
 }
 
 $('run').addEventListener('click', function(e) {

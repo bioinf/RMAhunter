@@ -12,7 +12,7 @@ const genes   = require('./genes.js').e;
 var port = parseInt(process.argv[2]);
 server.listen(port);
 
-app.use(express.static(__dirname));
+app.use(express.static('./web'));
 app.use(parser.urlencoded({extended : true, limit: '500mb'}));
 
 /* -------------------------------------------------------------------------- */

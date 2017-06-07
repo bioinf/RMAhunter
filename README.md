@@ -28,23 +28,24 @@ Systematic correction of reference minor alleles in clinical variant calling.
 
 ~~~
 git clone https://github.com/bioinf/RMAhunter.git && cd RMAhunter
-gzip -d build/data/sdf_plus.csv.gz build/data/sdf.csv.gz
-chmod +x build/exec/* build/*.py
+gzip -d data/sdf_plus.csv.gz data/sdf.csv.gz
+chmod +x exec/*
 ~~~
 
 ~~~
 Usage:
-  ./build/hunter2.py [input vcf-file] [Optional arguments]
+  ./exec/hunter.py [input vcf-file] [Optional arguments]
 
 Optional arguments:
   -f  Path to `input.vcf` file
-  -c  Report coding only [0 or 1]. Default: 1
+  -c  Report coding only [N or Y]. Default: Y
   -m  Allelic frequency cutoff. Default: 0.01
   -o  Output dir name
+  -z  Show non-calls [N or Y]. Default: Y
 
 Examples:
-  ./build/hunter.py input.vcf
-  ./build/hunter.py -f input.vcf -c 0 -m 0.05 -o results
+  ./exec/hunter.py input.vcf
+  ./exec/hunter.py -f input.vcf -c 0 -m 0.05 -o results
 ~~~
 
 

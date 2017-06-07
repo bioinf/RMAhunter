@@ -3,7 +3,6 @@
 # ---------------------------------------------------------------------------- #
 
 import sys, os, time
-import multiprocessing
 import json, base64
 
 from array import array
@@ -23,10 +22,10 @@ def fail(error = False) :
     print ''
     print 'Optional arguments:'
     print '  \033[1;37m-f\033[0;37m  Path to `input.vcf` file'
-    print '  \033[1;37m-c\033[0;37m  Report coding only [0 or 1]. Default: 1'
+    print '  \033[1;37m-c\033[0;37m  Report coding only [N or Y]. Default: Y'
     print '  \033[1;37m-m\033[0;37m  Allelic frequency cutoff. Default: 0.01'
     print '  \033[1;37m-o\033[0;37m  Output dir name'
-    print '  \033[1;37m-t\033[0;37m  Number of threads. Default: ' + str(multiprocessing.cpu_count())
+    print '  \033[1;37m-z\033[0;37m  Show non-calls [N or Y]. Default: Y'
     print ''
     print 'Examples:'
     print '  \033[1;37m' + sys.argv[0] + '\033[0;37m input.vcf'
@@ -67,8 +66,8 @@ try:
     argx = {
         '-f' : sys.argv[1],
         '-b' : '/dev/null',
-        '-t' : multiprocessing.cpu_count(),
-        '-c' : '1',
+        '-c' : 'Y',
+        '-z' : 'Y',
         '-m' : '0.01',
         '-o' : 'output_' + datetime.now().strftime("%Y-%m-%d_%H-%M-%S") 
     }
@@ -131,7 +130,7 @@ dir = os.path.dirname(os.path.realpath(__file__)) + '/'
 # zyg = ['X', '1/1', '0/1', '0/0', './1', './.'];
 
 sdf_plus = {}
-with open(dir + 'data/sdf_plus.csv') as sdfp:
+with open(dir + '../data/sdf_plus.csv') as sdfp:
     next(sdfp)
     for line in sdfp:
         # Chromosome, Position, Ref, Alt, rsID,
@@ -140,9 +139,10 @@ with open(dir + 'data/sdf_plus.csv') as sdfp:
         # SIFT_score, SIFT_prediction, Relative,Gained
         e = line.replace('\n', '').split(',')
         skey = (':').join([e[0], e[17], e[18], e[19], e[20]])
+        e[18] = '1/1'
         sdf_plus[skey] = e[0:7] + [''] + e[7:11] + ['',''] + e[11:]
 
-with open(dir + 'data/sdf.csv') as sdf:
+with open(dir + '../data/sdf.csv') as sdf:
     next(sdf)
     for line in sdf:
         # Chromosome, Position, Ref, Alt, ID,
@@ -154,8 +154,8 @@ with open(dir + 'data/sdf.csv') as sdf:
         if len(e) < 20 : continue
         e.append('?/?')
 
-        # 0. Только выбранный класс интересует нас (only coding? = 1)
-        if argx['-c'] == '1' and e[20] == 'NO' : continue
+        # 0. Только выбранный класс интересует нас (only coding? = Y)
+        if argx['-c'] == 'Y' and e[20] == 'NO' : continue
         
         maxafs = max(float(e[9]), float(e[10]), float(e[11]))
 
@@ -196,10 +196,11 @@ with open(dir + 'data/sdf.csv') as sdf:
             # - Что не находится в файле юзера сохраняется в список 1 c генотипом ./.
             if z == -1 :
                 e[21] = './.'
-                fx.add('tbl.'+n+'.t1', str(maxafs) + '\t' + (',').join(e))
+                if argx['-z'] == 'Y' :
+                    fx.add('tbl.'+n+'.t1', str(maxafs) + '\t' + (',').join(e))
 
             # - Что находится в файле юзера в зиготности 0/0
-            # сохраняется в список 1 (изменяем зиготность 1/1, помечаем)
+            # сохраняется в список 1 (изменяем зиготность 1/1, помечаем (?))
             if z == 3 :
                 e[21] = '1/1'
                 fx.add('tbl.'+n+'.t1', str(maxafs) + '\t' + (',').join(e))
@@ -220,11 +221,11 @@ for name in names :
 # ---------------------------------------------------------------------------- #
 # Make HTML report
 
-css = '<style>' + open(dir + 'web/client/style.css', "r").read() + '</style>'
-ico = 'data:image/x-icon;base64,' + base64.b64encode(open(dir + 'web/client/favicon.ico', "r").read())
-jsx = '<script>' + open(dir + 'web/client/app.js', "r").read() + '</script>'
+css = '<style>' + open(dir + '../web/client/style.css', "r").read() + '</style>'
+ico = 'data:image/x-icon;base64,' + base64.b64encode(open(dir + '../web/client/favicon.ico', "r").read())
+jsx = '<script>' + open(dir + '../web/client/app.js', "r").read() + '</script>'
 
-template = open(dir + 'web/index.html', "r").read()
+template = open(dir + '../web/index.html', "r").read()
 template = template.replace('<link rel="stylesheet" href="client/style.css">', css)
 template = template.replace('<script src="client/app.js"></script>', jsx)
 template = template.replace('client/favicon.ico', ico)
