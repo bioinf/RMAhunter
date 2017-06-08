@@ -20,12 +20,12 @@ app.post('/upload', (req, res) => {
     // Демонстрашка
     if (req.body.coding == 'demo'){
         setTimeout(function(){
-            res.send(JSON.stringify(['demo', [208,2378,7,9]]));
+            res.send(JSON.stringify(['demo', [29,245,2,1]]));
         }, 2 * 1000);
         return ;
     }
 
-    var coding = req.body.coding == 1 ? '1' : '0';
+    var coding = req.body.coding == 1 ? 'Y' : 'N';
     var maxafs = parseFloat(req.body.maxafs);
     if (isNaN(maxafs)) maxafs = 0.5;
 

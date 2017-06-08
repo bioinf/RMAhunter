@@ -59,11 +59,13 @@ curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
 sudo apt install -y nodejs npm
 npm install forever -g
 npm install
-~~~
 
-Starting web-server on port `8915`
+# Make demo samples
+cp data/demo.xvcf /tmp/demo.xvcf
+cp data/demo.xbed /tmp/demo.xbed
+./exec/app.sh demo Y 0.01
 
-~~~
+# Starting web-server on port `8915`
 nodejs ./exec/hunter.js 8915 # for debug
 forever start ./exec/hunter.js 8915 # for production
 ~~~

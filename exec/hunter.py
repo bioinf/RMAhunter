@@ -209,11 +209,11 @@ with open(dir + '../data/sdf.csv') as sdf:
 
         # -. Поиск в файле юзера
         key = (':').join(e[0:4])
-        zyg = vcf_data[key] if key in vcf_data else -1
+        zyg = vcf_data[key] if key in vcf_data else (-1)
         afs = True if maxafs > argx['-m'] else False
 
         for n, h in enumerate(vcf_header) :
-            z = (-1) if zyg == -1 else zyg[n]
+            z = (-1) if zyg == (-1) else zyg[n]
             n = str(n)
 
             # => 3,4 таблица
