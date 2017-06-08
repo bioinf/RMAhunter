@@ -38,6 +38,7 @@ Usage:
 
 Optional arguments:
   -f  Path to `input.vcf` file
+  -v  Show log [N or Y]. Default: Y
   -c  Report coding only [N or Y]. Default: Y
   -m  Allelic frequency cutoff. Default: 0.01
   -o  Output dir name
@@ -55,8 +56,7 @@ Install Node.JS, npm, forever. Example (ubuntu):
 
 ~~~
 curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
-sudo apt install -y nodejs
-sudo apt install npm
+sudo apt install -y nodejs npm
 npm install forever -g
 npm install
 ~~~
@@ -64,33 +64,18 @@ npm install
 Starting web-server on port `8915`
 
 ~~~
-nodejs ./build/web/hunter.js 8915 # for debug
-forever start ./build/web/hunter.js 8915 # for production
+nodejs ./exec/hunter.js 8915 # for debug
+forever start ./exec/hunter.js 8915 # for production
 ~~~
 
-If file `build/data/sdf.csv` has been updated, you need to create a file with a list of genes for the web version:
+If file `data/sdf.csv` has been updated, you need to create a file with a list of genes for the web version:
 
 ~~~
 echo "exports.e = {" $(
   echo $(
-   cat build/data/sdf.csv | \
+   cat data/sdf.csv | \
     awk -F  "," {'print $6'} | sort | uniq | \
     awk '{print "\""$1"\":true"}'
   ) | sed 's/ /,/g'
-) "}" > build/web/genes.js
-~~~
-
-### How to build from sources
-
-~~~
-g++ -Werror -Wall -std=c++11 src/hunter.cpp -o build/exec/hunter # for debug
-g++ -g -std=c++11 src/hunter.cpp -o build/exec/hunter # for production
-
-# Delete temporary files
-rm -f build/web/results/*
-
-# Running on test files
-cp build/data/test.xvcf /tmp/demo.xvcf
-cp build/data/test.xbed /tmp/demo.xbed
-./build/exec/app.sh demo 1 0.1
+) "}" > exec/genes.js
 ~~~

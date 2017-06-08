@@ -79,6 +79,7 @@ var init = function(e){
     $('result').style.display = 'block';
     
     var make_table_rows = function(e, i){
+        if (typeof(e) != "string") return [];
         return e.split('\n').map(function(line){
             if (line == '') return '';
             var c = line.split(',');
@@ -111,10 +112,17 @@ var init = function(e){
         t.initial_count = count;
         t.tbody = t.childNodes[3];
         t.data = t.tbody.childNodes[1].childNodes[3];
-        t.load = function(){
+        t.load = function(set_page){
             $('ct' + i).innerHTML = t.count;
             $('dl' + i).style.display  = t.count > 0 ? 'block' : 'none';
-            $('dl' + i).href = '/results/' + key + '.ts' + i;
+            $('dl' + i).href = '/results/' + key + '/data/tbl.0.t' + i;
+            
+            if (set_page) t.page = set_page
+
+            if (t.count == 0) {
+                t.data.innerHTML = Tpl('row-empty', {});
+                t.content = 70 + 45 + 36 + 'px';
+            }
 
             t.maxpages = Math.floor(t.count/onpage) + 1;
             
@@ -140,9 +148,10 @@ var init = function(e){
                 return ;
             } else {
                 var p = (t.page - 1) + '';
-                if (p.length == 2) p = '0'  + p;
-                if (p.length == 1) p = '00' + p;
-                Request('/results/' + key + '.ts' + i + '.p' + p, '', function(e){
+                if (p.length == 3) p = '0'   + p;
+                if (p.length == 2) p = '00'  + p;
+                if (p.length == 1) p = '000' + p;
+                Request('/results/' + key + '/data/tbl.0.t' + i + '.p' + p, '', function(e){
                     load_part(e, i)
                 }, 'GET');
             }
@@ -274,7 +283,7 @@ $('gset-save').addEventListener('click', function(e) {
         for (var i in tables)
         {
             tables[i].count = tables[i].initial_count;
-            tables[i].load();
+            tables[i].load(1);
         }
         return ;
     }
@@ -286,7 +295,7 @@ $('gset-save').addEventListener('click', function(e) {
         key = x[0];
         for (var i in tables){
             tables[i].count = x[1][i];
-            tables[i].load();
+            tables[i].load(1);
         }
     });
 });

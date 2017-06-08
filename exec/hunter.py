@@ -22,6 +22,7 @@ def fail(error = False) :
     print ''
     print 'Optional arguments:'
     print '  \033[1;37m-f\033[0;37m  Path to `input.vcf` file'
+    print '  \033[1;37m-v\033[0;37m  Show log [N or Y]. Default: Y'
     print '  \033[1;37m-c\033[0;37m  Report coding only [N or Y]. Default: Y'
     print '  \033[1;37m-m\033[0;37m  Allelic frequency cutoff. Default: 0.01'
     print '  \033[1;37m-o\033[0;37m  Output dir name'
@@ -68,6 +69,8 @@ try:
         '-b' : '/dev/null',
         '-c' : 'Y',
         '-z' : 'Y',
+        '-v' : 'Y',
+        '-r' : 'Y',
         '-m' : '0.01',
         '-o' : 'output_' + datetime.now().strftime("%Y-%m-%d_%H-%M-%S") 
     }
@@ -89,6 +92,24 @@ if not os.path.exists(argx['-o'] + '/data/'):
     os.makedirs(argx['-o'] + '/data/')
 
 fx = Write(argx['-o'] + '/data/')
+
+
+# ---------------------------------------------------------------------------- #
+# Log
+def Log(param, value = "") :
+    if argx['-v'] != 'Y' : return
+    lim = 27
+    space = (lim - len(param)) * ' '
+    print '\033[1;37m' + param + (':' if value != "" else "") + space + ' \033[0;37m' + str(value) + '\033[0m'
+
+Log('Init time', datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+Log('Input file', argx['-f'])
+Log('Show log info', ('Yes' if argx['-v'] == 'Y' else 'No'))
+Log('Report coding only', ('Yes' if argx['-c'] == 'Y' else 'No'))
+Log('Allelic frequency cutoff', str(argx['-m']))
+Log('Output dir name', argx['-o'])
+Log('Show non-calls', ('Yes' if argx['-z'] == 'Y' else 'No'))
+
 
 # ---------------------------------------------------------------------------- #
 # Get VCF data
@@ -122,12 +143,36 @@ for line in f:
 
 f.close()
 
-#print [len(vcf_data), i]
-#sys.exit(0)
+Log('VCF file. Total lines', len(vcf_data))
+
+
+# ---------------------------------------------------------------------------- #
+BED = False
+if os.path.exists(argx['-b']) :
+    BED,c = {},0
+    b = open(argx['-b'])
+    for line in b:
+        c += 1
+        e = line.replace('\n', '').split('\t')
+        if e[0] not in BED : BED[e[0]] = {}
+        F,T = [int(e[1]), int(e[2])]
+        if F not in BED[e[0]] : BED[e[0]][F] = T
+    b.close()
+    if c == 0 : BED = False
+    
+
+def inBED(chr, point):
+    if chr not in BED : 
+        return False
+    for F in BED[chr] :
+        if point < F : continue
+        return point <= T
+    return False
+
 
 # ---------------------------------------------------------------------------- #
 dir = os.path.dirname(os.path.realpath(__file__)) + '/'
-# zyg = ['X', '1/1', '0/1', '0/0', './1', './.'];
+cnt = [0,0,0,0,0]
 
 sdf_plus = {}
 with open(dir + '../data/sdf_plus.csv') as sdfp:
@@ -157,6 +202,9 @@ with open(dir + '../data/sdf.csv') as sdf:
         # 0. Только выбранный класс интересует нас (only coding? = Y)
         if argx['-c'] == 'Y' and e[20] == 'NO' : continue
         
+        # 0. Только если есть в BED
+        if BED and not inBED(e[0], int(e[1])) : continue
+        
         maxafs = max(float(e[9]), float(e[10]), float(e[11]))
 
         # -. Поиск в файле юзера
@@ -174,12 +222,16 @@ with open(dir + '../data/sdf.csv') as sdf:
                 s0 = (':').join(e[0:4]) + ':0'
                 if s0 in sdf_plus : 
                     t_key = (':').join(sdf_plus[s0][0:4])
-                    if t_key in vcf_data : fx.add('tbl.'+n+'.t3', '0\t' + (',').join(sdf_plus[s0]))
+                    if t_key in vcf_data : 
+                        fx.add('tbl.'+n+'.t3', '0\t' + (',').join(sdf_plus[s0]))
+                        cnt[3] += 1
                     
                 s1 = (':').join(e[0:4]) + ':1'
                 if s1 in sdf_plus : 
                     t_key = (':').join(sdf_plus[s1][0:4])
-                    if t_key in vcf_data : fx.add('tbl.'+n+'.t4', '0\t' + (',').join(sdf_plus[s1]))
+                    if t_key in vcf_data : 
+                        fx.add('tbl.'+n+'.t4', '0\t' + (',').join(sdf_plus[s1]))
+                        cnt[4] += 1
 
             if afs : continue
 
@@ -190,6 +242,7 @@ with open(dir + '../data/sdf.csv') as sdf:
             if z == 1 :
                 e[21] = '1/1'
                 fx.add('tbl.'+n+'.t2', str(maxafs) + '\t' + (',').join(e))
+                cnt[2] += 1
 
             # => 1 таблицa
 
@@ -198,18 +251,26 @@ with open(dir + '../data/sdf.csv') as sdf:
                 e[21] = './.'
                 if argx['-z'] == 'Y' :
                     fx.add('tbl.'+n+'.t1', str(maxafs) + '\t' + (',').join(e))
+                    cnt[1] += 1
 
             # - Что находится в файле юзера в зиготности 0/0
             # сохраняется в список 1 (изменяем зиготность 1/1, помечаем (?))
             if z == 3 :
                 e[21] = '1/1'
                 fx.add('tbl.'+n+'.t1', str(maxafs) + '\t' + (',').join(e))
+                cnt[1] += 1
 
             # - Что находится в файле юзера в зиготности 0/1
             # сохраняется в список 1 (оставляем зиготность 0/1)
             if z == 2 :
                 e[21] = '0/1'
                 fx.add('tbl.'+n+'.t1', str(maxafs) + '\t' + (',').join(e))
+                cnt[1] += 1
+
+Log('False negative RMAs', cnt[1])
+Log('False positive RMAs', cnt[2])
+Log('Gained RMA-codon variants', cnt[3])
+Log('Rescued RMA-codon variants', cnt[4])
 
 names = fx.write_all()
 for name in names :
@@ -220,30 +281,30 @@ for name in names :
 
 # ---------------------------------------------------------------------------- #
 # Make HTML report
+if argx['-r'] == 'Y' :
+    css = '<style>' + open(dir + '../web/client/style.css', "r").read() + '</style>'
+    ico = 'data:image/x-icon;base64,' + base64.b64encode(open(dir + '../web/client/favicon.ico', "r").read())
+    jsx = '<script>' + open(dir + '../web/client/app.js', "r").read() + '</script>'
+    
+    template = open(dir + '../web/index.html', "r").read()
+    template = template.replace('<link rel="stylesheet" href="client/style.css">', css)
+    template = template.replace('<script src="client/app.js"></script>', jsx)
+    template = template.replace('client/favicon.ico', ico)
+    
+    for n, sample in enumerate(vcf_header) :
+        data = { 'samples' : vcf_header, 'table' : {}, 'current' : sample, 'counts' : [0,0,0,0] }
+        for i in ['1','2','3','4'] :
+            try :
+                data['table'][i] = open(argx['-o'] + '/data/tbl.' + str(n) + '.t' + i, "r").read()
+            except :
+                data['table'][i] = ""
+            data['counts'][int(i) - 1] = len(data['table'][i].split("\n")) - 1
+    
+        r = open(argx['-o'] + '/sample_' + str(n) + '.html', 'w+')
+        r.write(template.replace('/* data-local */', 'var local_data = ' + json.dumps(data)))
+        r.close()
 
-css = '<style>' + open(dir + '../web/client/style.css', "r").read() + '</style>'
-ico = 'data:image/x-icon;base64,' + base64.b64encode(open(dir + '../web/client/favicon.ico', "r").read())
-jsx = '<script>' + open(dir + '../web/client/app.js', "r").read() + '</script>'
-
-template = open(dir + '../web/index.html', "r").read()
-template = template.replace('<link rel="stylesheet" href="client/style.css">', css)
-template = template.replace('<script src="client/app.js"></script>', jsx)
-template = template.replace('client/favicon.ico', ico)
-
-for n, sample in enumerate(vcf_header) :
-    data = { 'samples' : vcf_header, 'table' : {}, 'current' : sample, 'counts' : [0,0,0,0] }
-    for i in ['1','2','3','4'] :
-        try :
-            data['table'][i] = open(argx['-o'] + '/data/tbl.' + str(n) + '.t' + i, "r").read()
-        except :
-            data['table'][i] = ""
-        data['counts'][int(i) - 1] = len(data['table'][i].split("\n")) - 1
-
-    r = open(argx['-o'] + '/sample_' + str(n) + '.html', 'w+')
-    r.write(template.replace('/* data-local */', 'var local_data = ' + json.dumps(data)))
-    r.close()
-
-print "Done"
+Log('Done')
 
 
 

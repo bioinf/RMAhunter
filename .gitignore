@@ -1,6 +1,6 @@
 _*
 index.php
-node_modules/*
-build/data/*.csv
-build/web/results/*.t*
+node_modules
+data/*.csv
+web/results/E*
 output*
