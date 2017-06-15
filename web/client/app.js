@@ -1,5 +1,6 @@
 "use strict";
 var local_data = local_data || false;
+var header = header || false;
 
 function Request(url, data, after, method){
     var method = method || 'POST';
@@ -32,7 +33,7 @@ function Log(str){
 function Pred(str){
     if (str != 'Deleterious') return str;
     return '<span style="color:#e00">Deleterious</span>';
-};
+}
 
 /* -------------------------------------------------------------------------- */
 var BED = {};
@@ -50,22 +51,17 @@ var onpage = 30;
 $('result-tables').innerHTML += Tpl('table12', {
     'id' : 1,
     'header' : 'False negative RMAs',
-    'desc' : 'NB: this list is likely to include filtered and not covered sites; hence, provide a non-filtered VCF along with a BED file OR manually curate interesting positions!'
+    'desc' : 'False negative RMAs are sites at which your sample has a reference allele in contrast to the majority of global population. Genotype string 1/1 indicates that a minor (reference) allele is present in the homozygous state.'
 });
 $('result-tables').innerHTML += Tpl('table12', {
     'id' : 2,
     'header' : 'False positive RMAs',
-    'desc' : ''
+    'desc' : 'False positive RMAs are sites at which your sample has a non-reference allele, similar to the majority of the global population. Genotype string 0/0 indicates that a major (non-reference) allele is present in the homozygous state.'
 });
 $('result-tables').innerHTML += Tpl('table34', {
     'id' : 3,
     'header' : 'Gained RMA-codon variants',
-    'desc' : ''
-});
-$('result-tables').innerHTML += Tpl('table34', {
-    'id' : 4,
-    'header' : 'Rescued RMA-codon variants',
-    'desc' : ''
+    'desc' : 'Misannotated variants in the RMA codons. These are variants that fall into the same codon with the RMA site at which an alternative allele is discovered, leading to variant type misannotation.'
 });
 
 var init = function(e){
@@ -91,11 +87,11 @@ var init = function(e){
             if (i > 2){
                 c[7] = [c[6], c[7]].join('</td><td>');
             }
-            // RefAFs
+            /* RefAFs */
             c[9]  = parseFloat(c[9] ).toFixed(4);
             c[10] = parseFloat(c[10]).toFixed(4);
             c[11] = parseFloat(c[11]).toFixed(4);
-            // Predictions
+            /* Predictions */
             c[15] = Pred(c[15]);
             c[17] = Pred(c[17]);
             c[19] = Pred(c[19]);
@@ -117,7 +113,7 @@ var init = function(e){
             $('dl' + i).style.display  = t.count > 0 ? 'block' : 'none';
             $('dl' + i).href = '/results/' + key + '/data/tbl.0.t' + i;
             
-            if (set_page) t.page = set_page
+            if (set_page) t.page = set_page;
 
             if (t.count == 0) {
                 t.data.innerHTML = Tpl('row-empty', {});
@@ -141,7 +137,7 @@ var init = function(e){
             };
 
             if (local_data) {
-                var cn = (t.page - 1) * onpage
+                var cn = (t.page - 1) * onpage;
                 var e = local_data.table[i].split('\n').slice(cn, cn + onpage).join('\n');
                 load_part(e, i);
                 $('dl' + i).href = key + '.t' + i;
@@ -196,13 +192,23 @@ var init = function(e){
 };
 
 if (local_data) {
-    var opt = local_data.samples.map(function(e, i){
-        var current = local_data.current == e ? ' selected ' : '';
-        return '<option value="sample_'+i+'.html" '+current+'>' + e + '</option>'
-    }).join();
-    $('top-pane').innerHTML = '<select id="sampleID">' + opt + '</select>';
-    $('sampleID').onchange = function(){ location.href = this.value; }
-    init(JSON.stringify(['data/tbl.' + (local_data.samples.indexOf(local_data.current)), local_data.counts]));
+    if (header) {
+        var opt = '<option>Select sample ...</option>';
+        for (var i in header) opt += '<option value="samples/'+i+'.html">' + header[i] + '</option>';
+        $('init-local').innerHTML += '<pre>' + log + '</pre>';
+        $('init-local').innerHTML += '<select id="sampleID">' + opt + '</select>';
+        $('input').style.display = 'none';
+        
+    } else {
+        var opt = local_data.samples.map(function(e, i){
+            var current = local_data.current == e ? ' selected ' : '';
+            return '<option value="../samples/'+i+'.html" '+current+'>' + e + '</option>'
+        }).join();
+        $('top-pane').innerHTML = '<select id="sampleID">' + opt + '</select>';
+        init(JSON.stringify(['../data/tbl.' + (local_data.samples.indexOf(local_data.current)), local_data.counts]));
+    }
+
+    $('sampleID').onchange = function(){ location.href = this.value; };
 }
 
 $('run').addEventListener('click', function(e) {
@@ -216,6 +222,7 @@ $('run').addEventListener('click', function(e) {
     var q = '';
     q += 'maxafs=' + parseFloat($('maxafs').value);
     q += '&coding=' + ($('coding').checked ? 1 : 0);
+    q += '&noncalls=' + ($('non-calls').checked ? 1 : 0);
 
     var data = [];
     for (var chr in VCF) {
@@ -223,7 +230,7 @@ $('run').addEventListener('click', function(e) {
         for (var pos in VCF[chr]) {
             chrbox += '$' + (parseInt(pos - last)).toString(32);
             chrbox += '@' + VCF[chr][pos];
-            // chrbox = $ offet @ zyg @ ref @ alt 
+            /* chrbox = $ offet @ zyg @ ref @ alt  */
             last = pos;
         }
         data.push(chrbox);
@@ -268,7 +275,7 @@ $('gset-close').addEventListener('click', function(e) {
 
 $('gset-save').addEventListener('click', function(e) {
     genes = {};
-    var txt = $('gset-area').value.replace(/(?:\r\n|\r|\n)/g, ',');
+    var txt = $('gset-area').value.replace(/(?:\r\n|\r| |\n)/g, ',');
     txt.replace(/ /g, '').split(',').map(function(gene){
         if (gene != '') genes[gene] = true;
     });
@@ -300,7 +307,8 @@ $('gset-save').addEventListener('click', function(e) {
     });
 });
 
-var draggable = false, current = [200,200];
+
+var draggable = false, current = [500,200];
 
 window.onmousemove = function(e){
     if (!draggable) return;
@@ -321,7 +329,7 @@ $('header-gset').onmousedown = function(e){
     draggable = [e.clientX, e.clientY];
 };
 
-// Выбран BED -> предобработка, подготовка к отправке
+/* Выбран BED -> предобработка, подготовка к отправке */
 $('bed').addEventListener('click', function(e) {
     if (process_init) {
         e.preventDefault();
@@ -345,11 +353,11 @@ $('bed').addEventListener('change', function(evt) {
             count ++;
         }
         Log('Done. Total intervals: ' + count);
-    }
+    };
     reader.readAsText(evt.target.files[0]);
 }, false);
 
-// Выбран VCF -> предобработка, подготовка к отправке
+/* Выбран VCF -> предобработка, подготовка к отправке */ 
 $('vcf').addEventListener('click', function(e) {
     if (process_init) {
         e.preventDefault();
@@ -373,13 +381,13 @@ $('vcf').addEventListener('change', function(evt) {
             if (!VCF[chr]) VCF[chr] = {};
             if (!VCF[chr][pos]) count ++;
             VCF[chr][pos]  = zygosity[(t.pop().split(':')[0])] || '5';
-            //                     REF          ALT
+            /*                     REF          ALT */
             VCF[chr][pos] += '@' + t[3] + '@' + t[4];
         }
         Log('Done. Total lines: ' + count);
         if (Object.keys(VCF).length) {
-            document.getElementsByClassName( 'pane' )[0].classList.remove('disable')
+            document.getElementsByClassName( 'pane' )[0].classList.remove('disable');
         }
-    }
+    };
     reader.readAsText(evt.target.files[0]);
 }, false);

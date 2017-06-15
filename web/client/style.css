@@ -6,7 +6,6 @@ body {
     font-weight: 400;
     color: #222;
     overflow-x: hidden;
-    background: #f9f7ff;
 }
 
 h1 {
@@ -60,37 +59,60 @@ h1 {
     background: #FFF;
     overflow: hidden;
     margin: 0 -20px 10px -20px;
-    padding: 15px 19px 0 19px;
+    padding: 0 20px;
     border: 1px dashed #eee;
     box-sizing: border-box;
     border-radius: 5px;
+    box-shadow: 0 10px 35px rgba(0,0,0,0.07);
 }
+
 .main p {
 	text-align: center;
 	margin-bottom: 8px;
 }
-.upload {
-    margin: 0 -5px;
-	width: 380px;
-	float: left;
-}
-.upload .box {
-	width: 50%;
-	padding: 0 5px;
-	float: left;
-}
-.correct {
-    margin: 0 -5px;
-	float: right;
-	width: 380px;
-}
-.correct .box {
-	width: 33.333%;
-	padding: 0 5px;
+
+.p1x3 {
+    float: left;
+    padding: 15px 0;
+    height: 120px;
+    overflow: hidden;
 }
 
+.p1x3.upload {
+    width: 210px;
+}
+.p1x3.options {
+    background: rgba(210, 217, 255, 0.2);
+    padding: 25px 20px !important;
+    width: 258px;
+}
+.p1x3.go {
+    padding: 42px 0;
+    width: 210px;
+}
+.p1x3 .box {
+	width: 100%;
+	margin: 5px 0;
+}
+
+
+.upload .box label {
+	text-align: left;
+	padding-left: 15px;
+	padding-right: 15px;
+}
+
+.btn-x {
+    padding: 0px 0;
+    line-height: 24px;
+}
+.btn-x input {
+    float: right;
+}
+
+
 svg.next {
-	margin: 30px auto 0 auto;
+    margin: 48px 0 0 0;
 	width: 60px;
 	display: block;
 	color: #F00;
@@ -111,13 +133,33 @@ svg.next {
 	margin: auto;
     margin-bottom: 300px;
 }
-#t1, #t3 {
+
+#init-local {
+    text-align: center;
+}
+#init-local pre {
+    width: 580px;
+    border: 1px solid #e8e8e8;
+    background: #f9f9f9;
+    padding: 15px;
+    margin: auto;
+    text-align: left;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+
+#t1 {
     background: #ffb1b1;
     border: 1px solid #ff8383;
 }
-#t2, #t4 {
+#t2 {
     background: rgba(44, 197, 0, 0.3);
     border: 1px solid #31ce00;
+}
+#t3 {
+    background: #ffeea0;
+    border: 1px solid #c7a400;
 }
     
     
@@ -131,12 +173,18 @@ table thead {
 	background: #fff9dd;
 }
 table th {
+    position: relative;
     height: 22px;
 	vertical-align: bottom;
 	padding: 10px 8px;
 	font-weight: 100;
 	line-height: 0;
 	border-bottom: 1px solid #eaeaea;
+}
+table th span {
+    position: absolute;
+    bottom: 2px;
+    line-height: 17px;
 }
 table th:not(:last-child) {
     border-right: 1px solid #eaeaea;
@@ -169,6 +217,69 @@ table td {
 .table .head .title {
     line-height: 20px;
 }
+
+
+
+[data-tooltip] {
+  position: relative;
+  z-index: 2;
+  cursor: pointer;
+}
+
+/* Hide the tooltip content by default */
+[data-tooltip]:before,
+[data-tooltip]:after {
+  visibility: hidden;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+  filter: progid: DXImageTransform.Microsoft.Alpha(Opacity=0);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Position tooltip above the element */
+[data-tooltip]:before {
+  position: absolute;
+  bottom: 150%;
+  left: 0px;
+  margin-bottom: 5px;
+  margin-left: 20px;
+  padding: 8px 12px;
+  width: 580px;
+  border-radius: 5px;
+  background-color: #000;
+  background-color: hsla(0, 0%, 20%, 0.9);
+  color: #fff;
+  content: attr(data-tooltip);
+  text-align: left;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+/* Triangle hack to make tooltip look like a speech bubble */
+[data-tooltip]:after {
+  position: absolute;
+  bottom: 150%;
+  left: 0;
+  margin-left: 40px;
+  width: 0;
+  border-top: 5px solid #000;
+  border-top: 5px solid hsla(0, 0%, 20%, 0.9);
+  border-right: 5px solid transparent;
+  border-left: 5px solid transparent;
+  content: " ";
+  font-size: 0;
+  line-height: 0;
+}
+
+/* Show tooltip content on hover */
+[data-tooltip]:hover:before,
+[data-tooltip]:hover:after {
+  visibility: visible;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+  filter: progid: DXImageTransform.Microsoft.Alpha(Opacity=100);
+  opacity: 1;
+}
+
 .table .head .desc {
     line-height: 18px;
     color: #444;
@@ -249,7 +360,6 @@ table tr:hover .pr-score {
 #go-back {
     
 }
-
 @media (max-width: 1420px) {
 	.tables {
 		padding: 0 10px;
@@ -399,9 +509,8 @@ table tr:hover .pr-score {
 
 .ref-afs {
     margin-bottom: 0;
-    height: 36px;
-    border-radius: 5px;
-    text-align: center;
+    width: 60px;
+    padding: 2px 6px;
 }
 
 .disable .btn, 
