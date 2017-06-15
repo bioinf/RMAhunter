@@ -40,6 +40,7 @@ Optional arguments:
   -f  Path to `input.vcf` file
   -v  Show log [N or Y]. Default: Y
   -c  Report coding only [N or Y]. Default: Y
+  -g  Analyze specific gene set [Comma separated list of genes]
   -m  Allelic frequency cutoff. Default: 0.01
   -o  Output dir name
   -z  Show non-calls [N or Y]. Default: Y
@@ -47,6 +48,7 @@ Optional arguments:
 Examples:
   ./exec/hunter.py input.vcf
   ./exec/hunter.py -f input.vcf -c 0 -m 0.05 -o results
+  ./exec/hunter.py -f input.vcf -g TLX1NB,USP17L25,TCP11X2,SFRP1,CAP1
 ~~~
 
 
@@ -59,13 +61,25 @@ curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
 sudo apt install -y nodejs npm
 npm install forever -g
 npm install
+~~~
 
-# Make demo samples
-cp data/demo.xvcf /tmp/demo.xvcf
-cp data/demo.xbed /tmp/demo.xbed
-./exec/app.sh demo Y 0.01
+Compress HTML, JS and CSS files  
 
-# Starting web-server on port `8915`
+~~~
+./exec/build.py
+~~~
+
+Make demo samples
+
+~~~
+gzip -d data/example.vcf.gz
+cp data/example.vcf /tmp/demo.xvcf && touch /tmp/demo.xbed
+./exec/app.sh demo Y N 0.01
+~~~
+
+Starting web-server on port `8915`
+
+~~~
 nodejs ./exec/hunter.js 8915 # for debug
 forever start ./exec/hunter.js 8915 # for production
 ~~~

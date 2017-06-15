@@ -2,12 +2,10 @@
 # -*- coding: utf-8 -*-
 # ---------------------------------------------------------------------------- #
 
-import sys, os, time
-import json, base64
+import sys, os, time, json
 
 from array import array
 from datetime import datetime
-
 from subprocess import Popen
 
 def fail(error = False) :
@@ -24,6 +22,7 @@ def fail(error = False) :
     print '  \033[1;37m-f\033[0;37m  Path to `input.vcf` file'
     print '  \033[1;37m-v\033[0;37m  Show log [N or Y]. Default: Y'
     print '  \033[1;37m-c\033[0;37m  Report coding only [N or Y]. Default: Y'
+    print '  \033[1;37m-g\033[0;37m  Analyze specific gene set [Comma separated list of genes]'
     print '  \033[1;37m-m\033[0;37m  Allelic frequency cutoff. Default: 0.01'
     print '  \033[1;37m-o\033[0;37m  Output dir name'
     print '  \033[1;37m-z\033[0;37m  Show non-calls [N or Y]. Default: Y'
@@ -31,6 +30,7 @@ def fail(error = False) :
     print 'Examples:'
     print '  \033[1;37m' + sys.argv[0] + '\033[0;37m input.vcf'
     print '  \033[1;37m' + sys.argv[0] + '\033[0;37m -f input.vcf -c 0 -m 0.05 -o results'
+    print '  \033[1;37m' + sys.argv[0] + '\033[0;37m -f input.vcf -g TLX1NB,USP17L25,TCP11X2,SFRP1,CAP1'
     print '\033[0m'
     sys.exit(1)
 
@@ -68,6 +68,7 @@ try:
         '-f' : sys.argv[1],
         '-b' : '/dev/null',
         '-c' : 'Y',
+        '-g' : '',
         '-z' : 'Y',
         '-v' : 'Y',
         '-r' : 'Y',
@@ -79,36 +80,52 @@ try:
         k, v = [sys.argv[i + first], sys.argv[i + first + 1]]
         if k in argx : argx[k] = v
     argx['-m'] = float(argx['-m'])
+    genes = False
+    if argx['-g'] != "All" and argx['-g'] != "" :
+        genes = {}
+        g = argx['-g'].split(',')
+        for g_name in g :
+            genes[g_name] = True
 except:
     fail('Аргументы где?')
 
 if not os.path.exists(argx['-f']) :
-    fail('vcf file not found (' + argx['-f'] + ')')
+    fail('VCF file not found (' + argx['-f'] + ')')
 
-if not os.path.exists(argx['-o']):
-    os.makedirs(argx['-o'])
+if os.path.exists(argx['-o']):
+    fail('Output directory already exists (' + argx['-o'] + ')')
 
-if not os.path.exists(argx['-o'] + '/data/'):
-    os.makedirs(argx['-o'] + '/data/')
+os.makedirs(argx['-o'] + '/data/')
 
 fx = Write(argx['-o'] + '/data/')
 
-
 # ---------------------------------------------------------------------------- #
 # Log
-def Log(param, value = "") :
-    if argx['-v'] != 'Y' : return
-    lim = 27
-    space = (lim - len(param)) * ' '
-    print '\033[1;37m' + param + (':' if value != "" else "") + space + ' \033[0;37m' + str(value) + '\033[0m'
+class Log :
+    def __init__(self) :
+        self.data = ''
+        self.space = 27
 
-Log('Init time', datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-Log('Input file', argx['-f'])
-Log('Show log info', ('Yes' if argx['-v'] == 'Y' else 'No'))
-Log('Report coding only', ('Yes' if argx['-c'] == 'Y' else 'No'))
-Log('Allelic frequency cutoff', str(argx['-m']))
-Log('Output dir name', argx['-o'])
-Log('Show non-calls', ('Yes' if argx['-z'] == 'Y' else 'No'))
+    def write(self, param, value = "") :
+        if argx['-v'] != 'Y' : return
+        space = (self.space - len(param)) * ' '
+        param += (':' if value != "" else "")
+
+        print '\033[1;37m' + param + space + '\033[0;37m' + str(value) + '\033[0m'
+        self.data += param + space + str(value) + '\n'
+    
+    def export(self) :
+        return json.dumps(self.data)
+
+log = Log()    
+
+log.write('Init time', datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+log.write('Input file', argx['-f'])
+log.write('Show log info', ('Yes' if argx['-v'] == 'Y' else 'No'))
+log.write('Report coding only', ('Yes' if argx['-c'] == 'Y' else 'No'))
+log.write('Allelic frequency cutoff', str(argx['-m']))
+log.write('Output dir name', argx['-o'])
+log.write('Show non-calls', ('Yes' if argx['-z'] == 'Y' else 'No'))
 
 
 # ---------------------------------------------------------------------------- #
@@ -143,7 +160,7 @@ for line in f:
 
 f.close()
 
-Log('VCF file. Total lines', len(vcf_data))
+log.write('Total lines in VCF file', len(vcf_data))
 
 
 # ---------------------------------------------------------------------------- #
@@ -172,7 +189,7 @@ def inBED(chr, point):
 
 # ---------------------------------------------------------------------------- #
 dir = os.path.dirname(os.path.realpath(__file__)) + '/'
-cnt = [0,0,0,0,0]
+cnt = [0,0,0,0]
 
 sdf_plus = {}
 with open(dir + '../data/sdf_plus.csv') as sdfp:
@@ -181,11 +198,11 @@ with open(dir + '../data/sdf_plus.csv') as sdfp:
         # Chromosome, Position, Ref, Alt, rsID,
         # Gene, Annotated_Type, Real_Type, 1000G_AF, ExAC_AF,
         # ESP_AF, PROVEAN_score, PROVEAN_prediction, Polyphen_score, Polyphen_prediction,
-        # SIFT_score, SIFT_prediction, Relative,Gained
+        # SIFT_score, SIFT_prediction, Relative, Gained
         e = line.replace('\n', '').split(',')
-        skey = (':').join([e[0], e[17], e[18], e[19], e[20]])
+        skey = (':').join([e[0], e[17], e[18], e[19]])
         e[18] = '1/1'
-        sdf_plus[skey] = e[0:7] + [''] + e[7:11] + ['',''] + e[11:]
+        sdf_plus[skey] = e[0:8] + [''] + e[8:11] + ['',''] + e[11:]
 
 with open(dir + '../data/sdf.csv') as sdf:
     next(sdf)
@@ -197,6 +214,8 @@ with open(dir + '../data/sdf.csv') as sdf:
         # Coding
         e = line.replace('\n', '').split(',')
         if len(e) < 20 : continue
+        if genes and e[5] not in genes : continue
+
         e.append('?/?')
 
         # 0. Только выбранный класс интересует нас (only coding? = Y)
@@ -216,61 +235,59 @@ with open(dir + '../data/sdf.csv') as sdf:
             z = (-1) if zyg == (-1) else zyg[n]
             n = str(n)
 
-            # => 3,4 таблица
+            # => 3,4 таблица - теперь просто таблица 3
+            
+            # → Что находится в файле юзера в зиготности 1/1 проверяем, 
+            # есть ли в файле sdf_plus.csv по колонкам Relative_Position, Relative_Ref, Relative_Alt
+            # Если есть, это потенциальное место ошибки, смотрим на колонки Position, Ref, Alt 
+            # и ищем их в пользовательском файле, если находим — добавляем в таблицу 3
             if z == 1 :
-                # => 3,4 таблица
-                s0 = (':').join(e[0:4]) + ':0'
-                if s0 in sdf_plus : 
-                    t_key = (':').join(sdf_plus[s0][0:4])
+                skey = (':').join(e[0:4])
+                if skey in sdf_plus : 
+                    t_key = (':').join(sdf_plus[skey][0:4])
                     if t_key in vcf_data : 
-                        fx.add('tbl.'+n+'.t3', '0\t' + (',').join(sdf_plus[s0]))
+                        fx.add('tbl.'+n+'.t3', '0\t' + (',').join(sdf_plus[skey]))
                         cnt[3] += 1
-                    
-                s1 = (':').join(e[0:4]) + ':1'
-                if s1 in sdf_plus : 
-                    t_key = (':').join(sdf_plus[s1][0:4])
-                    if t_key in vcf_data : 
-                        fx.add('tbl.'+n+'.t4', '0\t' + (',').join(sdf_plus[s1]))
-                        cnt[4] += 1
 
             if afs : continue
 
             # => 2 таблица
 
-            # - Что находится в файле юзера в зиготности 1/1
-            # сохраняется в список 2 (оставляем зиготность 1/1) 
+            # → Что находится в файле юзера в зиготности 1/1
+            # сохраняется в список 2 (меняем зиготность на 0/0) 
             if z == 1 :
-                e[21] = '1/1'
+                e[21] = '0/0'
                 fx.add('tbl.'+n+'.t2', str(maxafs) + '\t' + (',').join(e))
                 cnt[2] += 1
 
             # => 1 таблицa
 
-            # - Что не находится в файле юзера сохраняется в список 1 c генотипом ./.
+            # → Что не находится в файле юзера сохраняется в список 1 c генотипом ./.
             if z == -1 :
                 e[21] = './.'
                 if argx['-z'] == 'Y' :
                     fx.add('tbl.'+n+'.t1', str(maxafs) + '\t' + (',').join(e))
                     cnt[1] += 1
 
-            # - Что находится в файле юзера в зиготности 0/0
+            # → Что находится в файле юзера в зиготности 0/0
             # сохраняется в список 1 (изменяем зиготность 1/1, помечаем (?))
             if z == 3 :
                 e[21] = '1/1'
                 fx.add('tbl.'+n+'.t1', str(maxafs) + '\t' + (',').join(e))
                 cnt[1] += 1
 
-            # - Что находится в файле юзера в зиготности 0/1
+            # → Что находится в файле юзера в зиготности 0/1
             # сохраняется в список 1 (оставляем зиготность 0/1)
             if z == 2 :
                 e[21] = '0/1'
                 fx.add('tbl.'+n+'.t1', str(maxafs) + '\t' + (',').join(e))
                 cnt[1] += 1
 
-Log('False negative RMAs', cnt[1])
-Log('False positive RMAs', cnt[2])
-Log('Gained RMA-codon variants', cnt[3])
-Log('Rescued RMA-codon variants', cnt[4])
+log.write('Total samples', len(vcf_header))
+log.write('False negative RMAs',   cnt[1])
+log.write('False positive RMAs',   cnt[2])
+log.write('Misannotated variants', cnt[3])
+
 
 names = fx.write_all()
 for name in names :
@@ -282,29 +299,26 @@ for name in names :
 # ---------------------------------------------------------------------------- #
 # Make HTML report
 if argx['-r'] == 'Y' :
-    css = '<style>' + open(dir + '../web/client/style.css', "r").read() + '</style>'
-    ico = 'data:image/x-icon;base64,' + base64.b64encode(open(dir + '../web/client/favicon.ico', "r").read())
-    jsx = '<script>' + open(dir + '../web/client/app.js', "r").read() + '</script>'
-    
+    os.makedirs(argx['-o'] + '/samples/')
+
     template = open(dir + '../web/index.html', "r").read()
-    template = template.replace('<link rel="stylesheet" href="client/style.css">', css)
-    template = template.replace('<script src="client/app.js"></script>', jsx)
-    template = template.replace('client/favicon.ico', ico)
-    
+
     for n, sample in enumerate(vcf_header) :
-        data = { 'samples' : vcf_header, 'table' : {}, 'current' : sample, 'counts' : [0,0,0,0] }
-        for i in ['1','2','3','4'] :
+        data = { 'samples' : vcf_header, 'table' : {}, 'current' : sample, 'counts' : [0,0,0] }
+        for i in ['1','2','3'] :
             try :
                 data['table'][i] = open(argx['-o'] + '/data/tbl.' + str(n) + '.t' + i, "r").read()
             except :
                 data['table'][i] = ""
             data['counts'][int(i) - 1] = len(data['table'][i].split("\n")) - 1
     
-        r = open(argx['-o'] + '/sample_' + str(n) + '.html', 'w+')
+        r = open(argx['-o'] + '/samples/' + str(n) + '.html', 'w+')
         r.write(template.replace('/* data-local */', 'var local_data = ' + json.dumps(data)))
         r.close()
 
-Log('Done')
+    
+    r = open(argx['-o'] + '/index.html', 'w+')
+    r.write(template.replace('/* data-local */', 'var local_data = {}; var log = ' + log.export() +'; var header = ' + json.dumps(vcf_header)))
+    r.close()
 
-
-
+log.write('Done')

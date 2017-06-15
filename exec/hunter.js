@@ -20,12 +20,14 @@ app.post('/upload', (req, res) => {
     // Демонстрашка
     if (req.body.coding == 'demo'){
         setTimeout(function(){
-            res.send(JSON.stringify(['demo', [29,245,2,1]]));
+            res.send(JSON.stringify(['demo', [8,561,5]]));
         }, 2 * 1000);
         return ;
     }
 
     var coding = req.body.coding == 1 ? 'Y' : 'N';
+    var noncalls = req.body.noncalls == 1 ? 'Y' : 'N';
+
     var maxafs = parseFloat(req.body.maxafs);
     if (isNaN(maxafs)) maxafs = 0.5;
 
@@ -73,7 +75,7 @@ app.post('/upload', (req, res) => {
     fs.writeFileSync('/tmp/' + key + '.xbed', bed);
     
     // Обсчёт + разбиение на страницы
-    var argv = ['./exec/app.sh', key, coding, maxafs].join(' ');
+    var argv = ['./exec/app.sh', key, coding, noncalls, maxafs].join(' ');
     console.log(argv)
     
     exec(argv, function callback(error, stdout, stderr) {
