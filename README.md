@@ -28,7 +28,7 @@ Systematic correction of reference minor alleles in clinical variant calling.
 
 ~~~
 git clone https://github.com/bioinf/RMAhunter.git && cd RMAhunter
-gzip -d data/sdf_plus.csv.gz data/sdf.csv.gz
+gzip -d data/RMA_Annotations_NoESP.csv.gz data/RMA_Neighbor_Variants_WithEffs.csv.gz
 chmod +x exec/*
 ~~~
 

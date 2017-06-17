@@ -20,7 +20,7 @@ app.post('/upload', (req, res) => {
     // Демонстрашка
     if (req.body.coding == 'demo'){
         setTimeout(function(){
-            res.send(JSON.stringify(['demo', [15,1220,8]]));
+            res.send(JSON.stringify(['demo', [3,463,1]]));
         }, 2 * 1000);
         return ;
     }

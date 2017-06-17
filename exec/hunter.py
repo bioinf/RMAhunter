@@ -143,10 +143,11 @@ def zygnum(v):
 
 def coverage(format, v):
     F = format.split(':')
+    V = v.split(':')
     p = [i for i in range(len(F)) if F[i] == 'AD']
-    if len(p) == 0 :
-        return '0,0'
-    return v.split(':')[p[0]]
+    if len(p) != 0 and p[0] < len(V):
+        return V[p[0]]
+    return '0,0'
     
 
 params = 9
@@ -231,8 +232,8 @@ with open(dir + '../data/' + SDF) as sdf:
         e = line.replace('\n', '').split(',')
         if len(e) < 20 : continue
         if genes and e[5] not in genes : continue
-
-        #e.append('?/?')
+        
+        e.append('?/?')
         e.append('0,0')
 
         # 0. Только выбранный класс интересует нас (only coding? = Y)
@@ -254,21 +255,22 @@ with open(dir + '../data/' + SDF) as sdf:
                 e[22] = vcf_data_cov[key][n]
                 z = zyg[n]
 
-            n = str(n)
-
             # => 3,4 таблица - теперь просто таблица 3
             
             # → Что находится в файле юзера в зиготности 1/1 проверяем, 
             # есть ли в файле sdf_plus.csv по колонкам Relative_Position, Relative_Ref, Relative_Alt
             # Если есть, это потенциальное место ошибки, смотрим на колонки Position, Ref, Alt 
             # и ищем их в пользовательском файле, если находим — добавляем в таблицу 3
-            if z == 1 :
+            ztxt = ['','1/1','0/1']
+            if z == 1 or z == 2 :
                 skey = (':').join(e[0:4])
                 if skey in sdf_plus : 
                     t_key = (':').join(sdf_plus[skey][0:4])
                     if t_key in vcf_data : 
-                        fx.add('tbl.'+n+'.t3', '0\t' + (',').join(sdf_plus[skey]) + ',' + e[22])
-                        cnt[3] += 1
+                        if vcf_data[t_key][n] == 1 or vcf_data[t_key][n] == 2:
+                            fx.add('tbl.'+str(n)+'.t3', '0\t' + (',').join(sdf_plus[skey] + [vcf_data_cov[t_key][n], vcf_data_cov[key][n], ztxt[vcf_data[t_key][n]], ztxt[vcf_data[key][n]]]))
+                            cnt[3] += 1
+            n = str(n)
 
             if afs : continue
 

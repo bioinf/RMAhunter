@@ -86,13 +86,9 @@ var init = function(e){
             }
             if (i > 2){
                 /* RefAFs */
-                c[8]  = parseFloat(c[8]).toFixed(4);
-                c[9]  = parseFloat(c[9]).toFixed(4);
+                c[8] = parseFloat(c[8]).toFixed(4);
+                c[9] = parseFloat(c[9]).toFixed(4);
                 c[10] = parseFloat(c[10]).toFixed(4);
-                /* Predictions */
-                c[11] = Pred(c[11]);
-                c[13] = Pred(c[13]);
-                c[15] = Pred(c[15]);
                 return Tpl('row3', c);
             } else {
                 /* RefAFs */
