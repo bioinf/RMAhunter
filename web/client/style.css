@@ -309,6 +309,25 @@ table td {
     font-size: 11px;
     top: 2px;
 }
+.table .nt {
+    position: absolute;
+    right: 5px;
+    line-height: 18px;
+    font-size: 11px;
+    top: 2px;
+    color: #8a0000;
+}
+.table .nt.MISS {
+    color: #8a0000;
+}
+.table .nt.SYNON {
+    color: #506b00;
+}
+.table .nt.STOP {
+    color: #FF0000;
+}
+
+
 table tr:hover .pr-score {
 	opacity: 1;
 }

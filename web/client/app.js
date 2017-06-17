@@ -60,7 +60,7 @@ $('result-tables').innerHTML += Tpl('table12', {
 });
 $('result-tables').innerHTML += Tpl('table34', {
     'id' : 3,
-    'header' : 'Gained RMA-codon variants',
+    'header' : 'Misannotated variants in the RMA codon',
     'desc' : 'Misannotated variants in the RMA codons. These are variants that fall into the same codon with the RMA site at which an alternative allele is discovered, leading to variant type misannotation.'
 });
 
@@ -85,17 +85,26 @@ var init = function(e){
                 c[4] = Tpl('ncbi', { rs : c[4].replace('~', '').substr(2), h : c[4] });
             }
             if (i > 2){
-                c[7] = [c[6], c[7]].join('</td><td>');
+                /* RefAFs */
+                c[8]  = parseFloat(c[8]).toFixed(4);
+                c[9]  = parseFloat(c[9]).toFixed(4);
+                c[10] = parseFloat(c[10]).toFixed(4);
+                /* Predictions */
+                c[11] = Pred(c[11]);
+                c[13] = Pred(c[13]);
+                c[15] = Pred(c[15]);
+                return Tpl('row3', c);
+            } else {
+                /* RefAFs */
+                c[9]  = parseFloat(c[9] ).toFixed(4);
+                c[10] = parseFloat(c[10]).toFixed(4);
+                c[11] = parseFloat(c[11]).toFixed(4);
+                /* Predictions */
+                c[15] = Pred(c[15]);
+                c[17] = Pred(c[17]);
+                c[19] = Pred(c[19]);
+                return Tpl('row', c);
             }
-            /* RefAFs */
-            c[9]  = parseFloat(c[9] ).toFixed(4);
-            c[10] = parseFloat(c[10]).toFixed(4);
-            c[11] = parseFloat(c[11]).toFixed(4);
-            /* Predictions */
-            c[15] = Pred(c[15]);
-            c[17] = Pred(c[17]);
-            c[19] = Pred(c[19]);
-            return Tpl('row', c);
         }).filter(function(e){
             return e != '';
         });
@@ -380,9 +389,16 @@ $('vcf').addEventListener('change', function(evt) {
             if (chr.substr(0, 3) == 'chr') chr = chr.substr(3);
             if (!VCF[chr]) VCF[chr] = {};
             if (!VCF[chr][pos]) count ++;
-            VCF[chr][pos]  = zygosity[(t.pop().split(':')[0])] || '5';
-            /*                     REF          ALT */
+
+            var F = t[8].split(':');
+            var V = t[9].split(':');
+
+            VCF[chr][pos]  = zygosity[V[F.indexOf('GT')]] || '5';
+            /* + REF + ALT */
             VCF[chr][pos] += '@' + t[3] + '@' + t[4];
+            /* Покрытие */
+            var cpos = F.indexOf('AD');
+            VCF[chr][pos] += '@' + (cpos == -1 ? '0,0' : (V[cpos] || '0,0'));
         }
         Log('Done. Total lines: ' + count);
         if (Object.keys(VCF).length) {

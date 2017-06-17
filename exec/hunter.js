@@ -20,7 +20,7 @@ app.post('/upload', (req, res) => {
     // Демонстрашка
     if (req.body.coding == 'demo'){
         setTimeout(function(){
-            res.send(JSON.stringify(['demo', [8,561,5]]));
+            res.send(JSON.stringify(['demo', [15,1220,8]]));
         }, 2 * 1000);
         return ;
     }
@@ -44,12 +44,12 @@ app.post('/upload', (req, res) => {
 		if (!chr || isNaN(chr)) return false;
 		vcf[chr] = {};
 		blocks.splice(1).map(function(block){
-			var tmp = block.split('@'); // offet @ zyg @ ref @ alt,alt,alt,alt
+			var tmp = block.split('@'); // offet @ zyg @ ref @ alt,alt,alt,alt @ coverage
 			var d3  = tmp[3].split(',');
 			last += parseInt(tmp[0], 32);
 			for (var d in d3) {
     			// chr (num), pos, ref, alt, zyg (num)
-    			vcf += [chr, last, '', tmp[2], d3[d], '','','','', zygosity[parseInt(tmp[1])]].join('\t');
+    			vcf += [chr, last, '', tmp[2], d3[d], '','','','GT:AD', zygosity[parseInt(tmp[1])] + ':' + tmp[4]].join('\t');
     			vcf += '\n';
 			}
 		});

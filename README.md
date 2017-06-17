@@ -84,12 +84,12 @@ nodejs ./exec/hunter.js 8915 # for debug
 forever start ./exec/hunter.js 8915 # for production
 ~~~
 
-If file `data/sdf.csv` has been updated, you need to create a file with a list of genes for the web version:
+If file `data/RMA_Annotations_NoESP.csv` has been updated, you need to create a file with a list of genes for the web version:
 
 ~~~
 echo "exports.e = {" $(
   echo $(
-   cat data/sdf.csv | \
+   cat data/RMA_Annotations_NoESP.csv | \
     awk -F  "," {'print $6'} | sort | uniq | \
     awk '{print "\""$1"\":true"}'
   ) | sed 's/ /,/g'

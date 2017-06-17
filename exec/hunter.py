@@ -2,6 +2,11 @@
 # -*- coding: utf-8 -*-
 # ---------------------------------------------------------------------------- #
 
+SDF  = 'RMA_Annotations_NoESP.csv'
+SDFp = 'RMA_Neighbor_Variants_WithEffs.csv'
+
+# ---------------------------------------------------------------------------- #
+
 import sys, os, time, json
 
 from array import array
@@ -136,8 +141,17 @@ def zygnum(v):
     z = {'1/1' : 1, '0/1' : 2, '0/0' : 3, './1' : 4, './.' : 5}
     return z[v] if v in z else 0
 
+def coverage(format, v):
+    F = format.split(':')
+    p = [i for i in range(len(F)) if F[i] == 'AD']
+    if len(p) == 0 :
+        return '0,0'
+    return v.split(':')[p[0]]
+    
+
 params = 9
 vcf_data = {}
+vcf_data_cov = {}
 vcf_header = False
 
 f = open(argx['-f'])
@@ -154,9 +168,12 @@ for line in f:
 
     # CHR POS REF ALT sample1_zyg sample2_zyg sample3_zyg ...
     zyg = array('B', [zygnum(line[n + params]) for n,s in enumerate(vcf_header)])
+    cov = [coverage(line[8], line[n + params]) for n,s in enumerate(vcf_header)]
+
     for alt in line[4].split(',') :
         key = (':').join([line[0], line[1], line[3], alt])
         vcf_data[key] = zyg
+        vcf_data_cov[key] = cov
 
 f.close()
 
@@ -192,19 +209,18 @@ dir = os.path.dirname(os.path.realpath(__file__)) + '/'
 cnt = [0,0,0,0]
 
 sdf_plus = {}
-with open(dir + '../data/sdf_plus.csv') as sdfp:
+with open(dir + '../data/' + SDFp) as sdfp:
     next(sdfp)
     for line in sdfp:
         # Chromosome, Position, Ref, Alt, rsID,
-        # Gene, Annotated_Type, Real_Type, 1000G_AF, ExAC_AF,
-        # ESP_AF, PROVEAN_score, PROVEAN_prediction, Polyphen_score, Polyphen_prediction,
-        # SIFT_score, SIFT_prediction, Relative, Gained
+        # Gene, Annotated_Type, Real_Type, 1000G_AF, 
+        # ExAC_AF, ESP_AF, PROVEAN_score, PROVEAN_prediction, Polyphen_score, Polyphen_prediction,
+        # SIFT_score, SIFT_prediction, Relative_Position, Relative_Ref, Relative_Alt, Gained, Annotated_Eff, Real_Eff
         e = line.replace('\n', '').split(',')
         skey = (':').join([e[0], e[17], e[18], e[19]])
-        e[18] = '1/1'
-        sdf_plus[skey] = e[0:8] + [''] + e[8:11] + ['',''] + e[11:]
+        sdf_plus[skey] = e
 
-with open(dir + '../data/sdf.csv') as sdf:
+with open(dir + '../data/' + SDF) as sdf:
     next(sdf)
     for line in sdf:
         # Chromosome, Position, Ref, Alt, ID,
@@ -216,7 +232,8 @@ with open(dir + '../data/sdf.csv') as sdf:
         if len(e) < 20 : continue
         if genes and e[5] not in genes : continue
 
-        e.append('?/?')
+        #e.append('?/?')
+        e.append('0,0')
 
         # 0. Только выбранный класс интересует нас (only coding? = Y)
         if argx['-c'] == 'Y' and e[20] == 'NO' : continue
@@ -230,9 +247,13 @@ with open(dir + '../data/sdf.csv') as sdf:
         key = (':').join(e[0:4])
         zyg = vcf_data[key] if key in vcf_data else (-1)
         afs = True if maxafs > argx['-m'] else False
-
+        
         for n, h in enumerate(vcf_header) :
-            z = (-1) if zyg == (-1) else zyg[n]
+            z = -1
+            if zyg != -1 :
+                e[22] = vcf_data_cov[key][n]
+                z = zyg[n]
+
             n = str(n)
 
             # => 3,4 таблица - теперь просто таблица 3
@@ -246,7 +267,7 @@ with open(dir + '../data/sdf.csv') as sdf:
                 if skey in sdf_plus : 
                     t_key = (':').join(sdf_plus[skey][0:4])
                     if t_key in vcf_data : 
-                        fx.add('tbl.'+n+'.t3', '0\t' + (',').join(sdf_plus[skey]))
+                        fx.add('tbl.'+n+'.t3', '0\t' + (',').join(sdf_plus[skey]) + ',' + e[22])
                         cnt[3] += 1
 
             if afs : continue
