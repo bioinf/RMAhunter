@@ -70,6 +70,101 @@ h1 {
 	margin-bottom: 8px;
 }
 
+.help-images {
+    margin: 0 -8px 15px -8px;
+    overflow: hidden;
+}
+.help-image {
+    width: 33.333%;
+    float: left;
+}
+.help-image .l {
+    float: left;
+    width: 50%;
+}
+.help-image .l > p {
+    text-align: center;
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    margin: 10px 0;
+}
+.gray {
+    margin: 0 8px;
+    border-radius: 5px;
+    background: #f4f4f4;
+    overflow: hidden;
+    padding: 12px 12px 10px 12px;
+}
+.gray .row {
+    margin-bottom: 10px;
+}
+.gray .row > span {
+    line-height: 36px;
+    font-size: 1.05em;
+}
+.gray .row:last-child > span {
+    line-height: 20px;
+}
+.gray .nc {
+    width: 130px;
+    padding: 1px;
+    float: right;
+}
+.gray .nc > span, .gray .nc > b {
+    width: 18px;
+    height: 18px;
+    border: 1px solid #555;
+    margin: 0 0 -1px -1px;
+    float: left;
+    background: rgba(0,0,0,.1);
+}
+.gray .nc b {
+    background: none;
+    border-color: transparent;
+    position: relative;
+}
+.gray span.RMA {
+    position: absolute;
+    top: 13px;
+    left: -20px;
+    right: -20px;
+    text-align: center;
+}
+.gray span.RMA:before {
+    content: '';
+    display: block;
+    border: 7px solid #F00;
+    border-color: transparent;
+    border-bottom: 8px solid #F00; 
+    margin: -15px auto 5px auto;
+    width: 0px;
+}
+.gray span.bb.RMA:before {
+    border-bottom: 8px solid #00F; 
+}
+
+.gray .nc span.w {
+    background: #fff;
+    text-align: center;
+    line-height: 18px;
+    font-weight: bold;
+}
+.gray .r {
+    color: #F00;
+}
+.gray .b {
+    color: #00F;
+}
+.gray-in {
+    line-height: 20px;
+    border-radius: 5px;
+    background: rgba(0,0,0,0.1);
+    border: 1px solid rgba(0,0,0,0.1);
+    margin: 10px;
+    padding: 10px 0;
+    text-align: center;
+}
+
 .p1x3 {
     float: left;
     padding: 15px 0;
@@ -130,7 +225,7 @@ svg.next {
 	display: none;
 	max-width: 1400px;
 	margin: auto;
-    min-width: 1200px;
+    min-width: 1220px;
     margin-bottom: 300px;
 }
 
@@ -383,6 +478,14 @@ table tr:hover .pr-score {
 	.tables {
 		padding: 0 10px;
 		width: 100%;
+	}
+	.gray .nc > span, .gray .nc > b {
+    	width: 16px;
+    	height: 16px; 
+    	line-height: 15px !important;
+	}
+	.gray .nc {
+    	width: 110px
 	}
 }
 @media (max-width: 1250px) {

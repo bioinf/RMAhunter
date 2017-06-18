@@ -58,7 +58,6 @@
         s-0.9-2.4-1.8-2.4C131.9,70.2,131.5,71.6,132,73.3z M136.8,130.1c-1.4,1.4-1.8-0.8-1.7-7.6l0.2-9.5l1.7,7.6
         C138.1,125.9,138.1,128.8,136.8,130.1z"/>
     </svg>
-    
     <h1>RMA Hunter</h1>
     <div class="template" id="table12">
         <div class="table" id="t`id`">
@@ -250,6 +249,132 @@
     </div>
 
     <div class="tables" id="result">
+        <div class="help-images">
+            <div class="help-image">
+                <div class="gray">
+                    <div class="l">
+                        <p style="color: #f00">RMA false negative</p>
+                        <div class="row">
+                            <span>Major</span>
+                            <div class="nc">
+                                <span></span><span></span><span></span><span class="w r">A</span><span></span><span></span><span></span>
+                                <span></span><span></span><span></span><span class="w r">A</span><span></span><span></span><span></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <span>Sample</span>
+                            <div class="nc">
+                                <span></span><span></span><span></span><span class="w r">C</span><span></span><span></span><span></span>
+                                <span></span><span></span><span></span><span class="w r">C</span><span></span><span></span><span></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <span>Reference</span>
+                            <div class="nc">
+                                <span></span><span></span><span></span><span class="w r">A</span><span></span><span></span><span></span>
+                                <b></b><b></b><b></b><b> <span class="RMA">RMA</span> </b>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="l">
+                        <div class="gray-in">
+                            Standard annotation:<br>
+                            <span class="r">C → A (AF 0.99)</span><br>
+                            reported sample GT: <span class="r">0/0</span>
+                        </div>
+                        <div class="gray-in">
+                            Corrected annotation:<br>
+                            <span class="b">A → C (AF 0.01) </span><br>
+                            reported sample GT: <span class="b">1/1</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="help-image">
+                <div class="gray">
+                    <div class="l">
+                        <p style="color: #090">RMA false positive</p>
+                        <div class="row">
+                            <span>Major</span>
+                            <div class="nc">
+                                <span></span><span></span><span></span><span class="w r">A</span><span></span><span></span><span></span>
+                                <span></span><span></span><span></span><span class="w r">A</span><span></span><span></span><span></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <span>Sample</span>
+                            <div class="nc">
+                                <span></span><span></span><span></span><span class="w r">A</span><span></span><span></span><span></span>
+                                <span></span><span></span><span></span><span class="w r">A</span><span></span><span></span><span></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <span>Reference</span>
+                            <div class="nc">
+                                <span></span><span></span><span></span><span class="w r">C</span><span></span><span></span><span></span>
+                                <b></b><b></b><b></b><b> <span class="RMA">RMA</span> </b>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="l">
+                        <div class="gray-in">
+                            Standard annotation:<br>
+                            <span class="r">C → A (AF 0.99)</span><br>
+                            reported sample GT: <span class="r">1/1</span>
+                        </div>
+                        <div class="gray-in">
+                            Corrected annotation:<br>
+                            <span class="b">A → C (AF 0.01) </span><br>
+                            reported sample GT: <span class="b">0/0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="help-image">
+                <div class="gray">
+                    <div class="l">
+                        <p style="color: #d09d00">Variant misclassification</p>
+                        <div class="row">
+                            <span>Major</span>
+                            <div class="nc">
+                                <span></span><span></span><span class="w">T</span><span class="w b">C</span><span class="w r">G</span><span></span><span></span>
+                                <span></span><span></span><span class="w">T</span><span class="w b">C</span><span class="w r">G</span><span></span><span></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <span>Sample</span>
+                            <div class="nc">
+                                <span></span><span></span><span class="w">T</span><span class="w b">G</span><span class="w r">G</span><span></span><span></span>
+                                <span></span><span></span><span class="w">T</span><span class="w b">G</span><span class="w r">G</span><span></span><span></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <span>Reference</span>
+                            <div class="nc">
+                                <span></span><span></span><span class="w">T</span><span class="w b">C</span><span class="w r">A</span><span></span><span></span>
+                                <b></b><b></b><b></b>
+                                <b><span class="RMA bb">SNP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> </b>
+                                <b><span class="RMA">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RMA</span> </b>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="l">
+                        <div class="gray-in">
+                            Standard annotation:<br>
+                            <span class="r">Ser → STOP</span>
+                        </div>
+                        <div class="gray-in">
+                            Corrected annotation:<br>
+                            <span class="b">Ser → Trp</span><br>
+                            SNP GT: 1/1<br>
+                            Corrected RMA GT: <span class="b">0/0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
         <p class="spec-set" id="top-pane">
             <a id="gset-open" href="#">Analyze specific gene set<span id="gset-count"></span></a>
             <a id="go-back" href="/">&larr; return back (reset all)</a>
