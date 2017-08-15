@@ -147,6 +147,10 @@ def coverage(format, v):
     p = [i for i in range(len(F)) if F[i] == 'AD']
     if len(p) != 0 and p[0] < len(V):
         return V[p[0]]
+    p1 = [i for i in range(len(F)) if F[i] == 'RO']
+    p2 = [i for i in range(len(F)) if F[i] == 'AO']
+    if len(p1) * len(p2) != 0 and p1[0] < len(V) and p2[0] < len(V):
+        return V[p1[0]] + ',' + V[p2[0]]
     return '0,0'
     
 
@@ -166,6 +170,7 @@ for line in f:
 
     # Get lines
     if not vcf_header : continue
+    if line[0][0:3] == 'chr' : line[0] = line[0][3:]
 
     # CHR POS REF ALT sample1_zyg sample2_zyg sample3_zyg ...
     zyg = array('B', [zygnum(line[n + params]) for n,s in enumerate(vcf_header)])
