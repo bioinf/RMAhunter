@@ -92,7 +92,7 @@ try:
         for g_name in g :
             genes[g_name] = True
 except:
-    fail('Аргументы где?')
+    fail('In qua rationes? (Specify arguments. Please)')
 
 if not os.path.exists(argx['-f']) :
     fail('VCF file not found (' + argx['-f'] + ')')
@@ -254,6 +254,15 @@ with open(dir + '../data/' + SDF) as sdf:
         zyg = vcf_data[key] if key in vcf_data else (-1)
         afs = True if maxafs > argx['-m'] else False
         
+        index_file = {
+            't1' : [],
+            't2' : [],
+            't3' : [],
+            't1_line' : '',
+            't2_line' : '',
+            't3_line' : ''
+        }
+
         for n, h in enumerate(vcf_header) :
             z = -1
             if zyg != -1 :
@@ -273,7 +282,9 @@ with open(dir + '../data/' + SDF) as sdf:
                     t_key = (':').join(sdf_plus[skey][0:4])
                     if t_key in vcf_data : 
                         if vcf_data[t_key][n] == 1 or vcf_data[t_key][n] == 2:
-                            fx.add('tbl.'+str(n)+'.t3', '0\t' + (',').join(sdf_plus[skey] + [vcf_data_cov[t_key][n], vcf_data_cov[key][n], ztxt[vcf_data[t_key][n]], ztxt[vcf_data[key][n]]]))
+                            index_file['t3'].append(n)
+                            index_file['t3_line'] = '0\t' + (',').join(sdf_plus[skey] + [vcf_data_cov[t_key][n], vcf_data_cov[key][n], ztxt[vcf_data[t_key][n]], ztxt[vcf_data[key][n]]])
+                            fx.add('tbl.'+str(n)+'.t3', index_file['t3_line'])
                             cnt[3] += 1
             n = str(n)
 
@@ -285,7 +296,9 @@ with open(dir + '../data/' + SDF) as sdf:
             # сохраняется в список 2 (меняем зиготность на 0/0) 
             if z == 1 :
                 e[21] = '0/0'
-                fx.add('tbl.'+n+'.t2', str(maxafs) + '\t' + (',').join(e))
+                index_file['t2'].append(n)
+                index_file['t2_line'] = str(maxafs) + '\t' + (',').join(e)
+                fx.add('tbl.'+n+'.t2', index_file['t2_line'])
                 cnt[2] += 1
 
             # => 1 таблицa
@@ -294,22 +307,35 @@ with open(dir + '../data/' + SDF) as sdf:
             if z == -1 :
                 e[21] = './.'
                 if argx['-z'] == 'Y' :
-                    fx.add('tbl.'+n+'.t1', str(maxafs) + '\t' + (',').join(e))
+                    index_file['t1'].append(n)
+                    index_file['t1_line'] = str(maxafs) + '\t' + (',').join(e)
+                    fx.add('tbl.'+n+'.t1', index_file['t1_line'])
                     cnt[1] += 1
 
             # → Что находится в файле юзера в зиготности 0/0
             # сохраняется в список 1 (изменяем зиготность 1/1, помечаем (?))
             if z == 3 :
                 e[21] = '1/1'
-                fx.add('tbl.'+n+'.t1', str(maxafs) + '\t' + (',').join(e))
+                index_file['t1'].append(n)
+                index_file['t1_line'] = str(maxafs) + '\t' + (',').join(e)
+                fx.add('tbl.'+n+'.t1', index_file['t1_line'])
                 cnt[1] += 1
 
             # → Что находится в файле юзера в зиготности 0/1
             # сохраняется в список 1 (оставляем зиготность 0/1)
             if z == 2 :
                 e[21] = '0/1'
-                fx.add('tbl.'+n+'.t1', str(maxafs) + '\t' + (',').join(e))
+                index_file['t1'].append(n)
+                index_file['t1_line'] = str(maxafs) + '\t' + (',').join(e)
+                fx.add('tbl.'+n+'.t1', index_file['t1_line'])
                 cnt[1] += 1
+        
+        if len(index_file['t1']) > 0 :
+            fx.add('tbl._.t1', index_file['t1_line'] + ',' + ('|').join(map(str, index_file['t1'])))
+        if len(index_file['t2']) > 0 :
+            fx.add('tbl._.t2', index_file['t2_line'] + ',' + ('|').join(map(str, index_file['t2'])))
+        if len(index_file['t3']) > 0 :
+            fx.add('tbl._.t3', index_file['t3_line'] + ',' + ('|').join(map(str, index_file['t3'])))
 
 log.write('Total samples', len(vcf_header))
 log.write('False negative RMAs',   cnt[1])
@@ -328,10 +354,8 @@ for name in names :
 # Make HTML report
 if argx['-r'] == 'Y' :
     os.makedirs(argx['-o'] + '/samples/')
-
-    template = open(dir + '../web/index.html', "r").read()
-
-    for n, sample in enumerate(vcf_header) :
+    
+    def det_data(n, sample) :
         data = { 'samples' : vcf_header, 'table' : {}, 'current' : sample, 'counts' : [0,0,0] }
         for i in ['1','2','3'] :
             try :
@@ -339,14 +363,17 @@ if argx['-r'] == 'Y' :
             except :
                 data['table'][i] = ""
             data['counts'][int(i) - 1] = len(data['table'][i].split("\n")) - 1
-    
+        return data
+
+    template = open(dir + '../web/index.html', "r").read()
+
+    for n, sample in enumerate(vcf_header) :
         r = open(argx['-o'] + '/samples/' + str(n) + '.html', 'w+')
-        r.write(template.replace('/* data-local */', 'var local_data = ' + json.dumps(data)))
+        r.write(template.replace('/* data-local */', 'var local_data = ' + json.dumps(det_data(n,sample))))
         r.close()
 
-    
     r = open(argx['-o'] + '/index.html', 'w+')
-    r.write(template.replace('/* data-local */', 'var local_data = {}; var log = ' + log.export() +'; var header = ' + json.dumps(vcf_header)))
+    r.write(template.replace('/* data-local */', 'var local_data = ' + json.dumps(det_data('_', '_'))))
     r.close()
 
 log.write('Done')

@@ -74,6 +74,12 @@ var init = function(e){
     $('input').style.display  = 'none';
     $('result').style.display = 'block';
     
+    var samples_box = function(str){
+        var samples = str.split('|');
+        /* if (samples.length == 1) return local_data.samples[samples[0]]; */
+        return '('+samples.length+')';
+    };
+    
     var make_table_rows = function(e, i){
         if (typeof(e) != "string") return [];
         return e.split('\n').map(function(line){
@@ -84,6 +90,8 @@ var init = function(e){
             if (c[4].substr(0,3) == '~rs' || c[4].substr(0,2) == 'rs') {
                 c[4] = Tpl('ncbi', { rs : c[4].replace('~', '').substr(2), h : c[4] });
             }
+            c[55] = c[c.length-1];
+            c[56] = samples_box(c[55]);
             if (i > 2){
                 /* RefAFs */
                 c[8] = parseFloat(c[8]).toFixed(4);
@@ -197,26 +205,37 @@ var init = function(e){
 };
 
 if (local_data) {
-    if (header) {
-        var opt = '<option>Select sample ...</option>';
-        for (var i in header) opt += '<option value="samples/'+i+'.html">' + header[i] + '</option>';
-        $('init-local').innerHTML += '<pre>' + log + '</pre>';
-        $('init-local').innerHTML += '<select id="sampleID">' + opt + '</select>';
-        $('input').style.display = 'none';
-        
-    } else {
-        var opt = local_data.samples.map(function(e, i){
-            var current = local_data.current == e ? ' selected ' : '';
-            return '<option value="../samples/'+i+'.html" '+current+'>' + e + '</option>'
-        }).join();
-        $('top-pane').innerHTML = '<select id="sampleID">' + opt + '</select>';
-        init(JSON.stringify(['../data/tbl.' + (local_data.samples.indexOf(local_data.current)), local_data.counts]));
-    }
+    var current = local_data.current == '_' ? ' selected ' : '';
+    var opt = '<option value="../index.html" '+current+'>All samples</option>';
+    opt += local_data.samples.map(function(e, i){
+        var current = local_data.current == e ? ' selected ' : '';
+        return '<option value="'+ (local_data.current == '_' ? '' : '../') +'samples/'+i+'.html" '+current+'>' + e + '</option>'
+    }).join();
+    $('left-pane').innerHTML = '<select id="sampleID">' + opt + '</select>';
+    
+    var filename = local_data.current == '_' ? '_' : local_data.samples.indexOf(local_data.current);
+    init(JSON.stringify(['../data/tbl.' + filename, local_data.counts]));
 
     $('sampleID').onchange = function(){ location.href = this.value; };
+    
+    /* Доп колонка с перечислением сэмплов на главной */
+    if (local_data.current == '_') {
+        var t_header = function(){
+            var t = document.createElement('th');
+            t.setAttribute('rowspan', 2);
+            t.setAttribute('width', 75);
+            t.innerHTML = 'Samples';
+            return t;
+        };
+        $('t1').children[1].children[0].children[0].children[0].append(t_header());
+        $('t2').children[1].children[0].children[0].children[0].append(t_header());
+        $('t3').children[1].children[0].children[0].children[0].append(t_header());
+        
+        $('body').classList.add('local-data');
+    }
 }
 
-$('run').addEventListener('click', function(e) {
+if ($('run')) $('run').addEventListener('click', function(e) {
     if (process_init) return ;
     if (!Object.keys(VCF).length) return ;
 
@@ -328,6 +347,20 @@ window.onmouseup = function(e){
         current[1] - draggable[1] + e.clientY
     ];
     draggable = false;
+};
+
+window.onclick = function(e) {
+    if (e.target.tagName == "TEXTAREA") return ;
+    $('textarea-tpl').style.display = 'none';
+    if (e.target.dataset && e.target.dataset.samples) {
+        $('textarea-tpl').style.display = 'block';
+        $('textarea-tpl').style.top = e.target.offsetTop + 'px';
+        $('textarea-tpl').style.left = e.target.offsetLeft - 200 + 75 + 1 + 'px';
+        $('textarea-tpl').childNodes[1].value = e.target.dataset.samples.split('|').map(function(num){
+            return local_data.samples[num];
+        }).join('\n');
+    }
+    
 };
 
 $('header-gset').onmousedown = function(e){

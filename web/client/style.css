@@ -243,6 +243,35 @@ svg.next {
     margin-bottom: 20px;
 }
 
+.samples {
+    cursor: pointer;
+    overflow: visible;
+    position: relative;
+    display: none;
+}
+.samples {
+    color: #6265ff;
+}
+.local-data .samples {
+    display: table-cell;
+}
+.textarea {
+    display: none;
+    z-index: 30;
+    width: 200px;
+    position: absolute;
+    right: -1px;
+    top: -1px;
+    padding: 4px;
+    background: #ffe6e6;
+    border-radius: 3px 0 3px 3px;
+    border: 1px solid #ffbcbc;
+}
+.textarea textarea {
+    margin: 0;
+    float: left;
+}
+
 
 #t1 {
     background: #ffb1b1;
