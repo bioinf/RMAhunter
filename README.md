@@ -63,6 +63,12 @@ npm install forever -g
 npm install
 ~~~
 
+Instead of `forever`, you can use `nodemon`
+
+~~~
+sudo npm install -g nodemon
+~~~
+
 Compress HTML, JS and CSS files  
 
 ~~~
@@ -80,8 +86,9 @@ cp data/example.vcf /tmp/demo.xvcf && touch /tmp/demo.xbed
 Starting web-server on port `8915`
 
 ~~~
-nodejs ./exec/hunter.js 8915 # for debug
-forever start ./exec/hunter.js 8915 # for production
+nodejs ./exec/hunter.js 8915                       # for debug
+forever start ./exec/hunter.js 8915                # for production (using forever)
+nohup nodemon ./exec/hunter.js 8915 </dev/null &   # for production (using nodemon)
 ~~~
 
 If file `data/RMA_Annotations_NoESP.csv` has been updated, you need to create a file with a list of genes for the web version:
