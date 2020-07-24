@@ -15,12 +15,9 @@ sequencing assays) a BED-file containing enrichment intervals. To analyze only
 specific genes of interest, please enter a list of genes (separate with comma 
 or a newline) in the box provided.
 
-**Please cite the tool as:**  
-Barbitoff Y.A., Bezdvornykh I.V., Serebryakova E.A., Glotov A.S., Glotov O.S. 
-and Predeus A.V.  
-Systematic correction of reference minor alleles in clinical variant calling. 
-(2016)
+## Reference
 
+Barbitoff YA, Bezdvornykh IV, Polev DE, Serebryakova EA, Glotov AS, Glotov OS, Predeus AV, [Catching hidden variation: systematic correction of reference minor allele annotation in clinical variant calling](https://www.nature.com/articles/gim2017168), *Genetics in Medicine* **2018**, 20(3), 360–364.
 
 ## Quick Start
 
@@ -102,3 +99,7 @@ echo "exports.e = {" $(
   ) | sed 's/ /,/g'
 ) "}" > exec/genes.js
 ~~~
+
+## Contacts
+
+If you have any questions, please contact Yury A Barbitoff (barbitoff at bioinf me) or Alexander V Predeus (predeus at bioinf me).
